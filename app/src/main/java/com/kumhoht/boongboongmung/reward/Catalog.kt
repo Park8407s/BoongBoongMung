@@ -24,7 +24,7 @@ data class Item(
 
 /**
  * 1차 버전 아이템 13종 + 배경 3종. 그래픽은 Pet Renderer 가 레이어로 그린다.
- * 피그마 일러스트가 있는 아이템(밀짚모자·선글라스·파랑 목도리)은 이미지로, 나머지는 Canvas 로 그린다.
+ * 붕붕이·아이템은 모두 Canvas 로 그린다 (디자인 캔버스 v3 시안 기준).
  */
 object Catalog {
     val items: List<Item> = listOf(

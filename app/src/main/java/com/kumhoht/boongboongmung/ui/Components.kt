@@ -292,11 +292,6 @@ fun LineRow(label: String, value: String, modifier: Modifier = Modifier, strong:
     }
 }
 
-@Composable
-fun ThinDivider() {
-    Box(Modifier.fillMaxWidth().height(2.dp).background(Boong.Divider))
-}
-
 /** 숫자 타일 (v3: 크림 배경, 큰 숫자 + 작은 라벨) */
 @Composable
 fun StatTile(value: String, label: String, modifier: Modifier = Modifier, labelFirst: Boolean = false, valueSize: Int = 58) {

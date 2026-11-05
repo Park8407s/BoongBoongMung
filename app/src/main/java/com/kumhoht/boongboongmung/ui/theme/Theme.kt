@@ -36,14 +36,10 @@ object Boong {
     val GroundTop = Color(0xFFDCC2A6)
     val Outline = Color(0xFF5A3E2B)      // 캐릭터 외곽선
 
-    // 이전 이름 (다이얼로그·Canvas 아이템에서 사용)
+    // 캐릭터·다이얼로그용 추가 색
     val Frame = Brown
     val Line = Outline
-    val ChipOn = Brown
-    val Equip = ChipText
     val Gift = Color(0xFFE2725B)
-    val Warn = Accent
-    val Dashboard = Ground
     val Cheek = Color(0xFFF7B3B5)
     val Ear = Color(0xFFF2D6B8)
 }
