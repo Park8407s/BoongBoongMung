@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,29 +67,30 @@ fun ResultScreen(
         showExtras = true
     }
 
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-        BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 14.dp) {
-            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(16.dp))) {
+    // 피그마 '그림 2. 운행 종료 결과 화면' 1682×1210: 캐릭터 카드 : 결과 카드 ≈ 1 : 1.34, 카드 간격 40
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+        BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 20.dp) {
+            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(18.dp))) {
                 PetView(equipped, Expression.SURPRISED, Modifier.fillMaxSize(), reactKey = trip.id)
             }
-            VSpace(10.dp)
+            VSpace(20.dp)
             Text(
                 trip.feedback,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             )
         }
 
-        BoongCard(Modifier.weight(1.1f).fillMaxHeight()) {
+        BoongCard(Modifier.weight(1.34f).fillMaxHeight(), padding = 40.dp) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("오늘의 드라이브", style = MaterialTheme.typography.titleLarge)
+                Text("오늘의 드라이브", style = MaterialTheme.typography.headlineSmall)
                 if (trip.replay) {
-                    HSpace(10.dp)
+                    HSpace(12.dp)
                     Pill(bg = Boong.Chip) { Text("주행 로그 재생", style = MaterialTheme.typography.labelMedium) }
                 }
             }
-            VSpace(6.dp)
+            VSpace(14.dp)
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                 lines.take(shownLines.value).forEach { l ->
                     LineRow(l.label, "+${l.points}")
@@ -129,14 +132,15 @@ fun ResultScreen(
                 }
             }
             VSpace(8.dp)
+            // 합계 (피그마: '합계' 26 Medium, 뼈다귀 + Jua 40)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("합계", style = MaterialTheme.typography.titleLarge)
+                Text("합계", fontSize = 26.sp, fontWeight = FontWeight.Medium, color = Boong.Brown)
                 Box(Modifier.weight(1f))
                 BoneCount(total.value.toInt(), prefix = "+", big = true)
             }
-            VSpace(8.dp)
+            VSpace(10.dp)
             ProgressBar(wallet.progress.boxFraction)
-            VSpace(6.dp)
+            VSpace(8.dp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "다음 선물상자까지 ${wallet.progress.kmToNextBox}km · Lv.${wallet.progress.level + 1}까지 ${wallet.progress.kmToNextLevel}km",

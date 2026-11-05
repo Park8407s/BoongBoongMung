@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -77,32 +79,34 @@ fun HomeScreen(
         else -> "오늘도 안전하게 달려요!"
     }
 
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-        BoongCard(Modifier.weight(1.15f).fillMaxHeight(), padding = 14.dp) {
+    // 피그마 '그림 3. 홈 화면' 1682×1210: 캐릭터 카드 : 오른쪽 열 ≈ 1.49 : 1, 카드 간격 40
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+        BoongCard(Modifier.weight(1.49f).fillMaxHeight(), padding = 20.dp) {
+            // 창밖 풍경 (모서리 18) 안에 붕붕이
             Box(
                 Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(18.dp))
             ) {
                 PetView(equipped, expression, Modifier.fillMaxSize(), reactKey = reactKey.takeIf { it > 0 })
             }
-            VSpace(10.dp)
+            VSpace(20.dp)
             Text(
                 "“$line”",
                 style = MaterialTheme.typography.titleMedium,
                 color = if (beltWarn) Boong.Gift else Color.Unspecified,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             )
         }
 
         Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             BoongCard(Modifier.fillMaxWidth().weight(1f)) {
-                Text("최근 드라이브", style = MaterialTheme.typography.titleLarge)
-                VSpace(10.dp)
+                Text("최근 드라이브", style = MaterialTheme.typography.titleMedium)
+                VSpace(16.dp)
                 if (latest == null) {
-                    Text("아직 기록이 없어요.\n기어를 D로 바꾸고 출발해 보세요!", style = MaterialTheme.typography.bodyLarge, color = Boong.BrownSoft)
+                    Text("아직 기록이 없어요.\n기어를 D로 바꾸고 출발해 보세요!", style = MaterialTheme.typography.bodyLarge)
                 } else {
                     val pct = latest.smoothPercent()
                     Text(
@@ -111,41 +115,44 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-                VSpace(4.dp)
+                VSpace(8.dp)
                 Text("칭호: ${wallet.title}", style = MaterialTheme.typography.bodyLarge)
                 if (wallet.progress.state.streakDays > 0) {
-                    VSpace(4.dp)
+                    VSpace(8.dp)
                     Text("연속 안전운전 ${wallet.progress.state.streakDays}일째", style = MaterialTheme.typography.bodyLarge)
                 }
                 if (beltUnbuckled != null) {
-                    VSpace(4.dp)
+                    VSpace(8.dp)
                     Text(
                         if (beltUnbuckled) "안전벨트: 안 맴 · 출발 전에 매 주세요" else "안전벨트: 맴 ✓",
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (beltUnbuckled) Boong.Gift else Boong.Good,
                     )
                 }
-                VSpace(14.dp)
+                Spacer(Modifier.weight(1f))
                 Text(
                     "다음 선물상자까지 ${wallet.progress.kmToNextBox}km · Lv.${wallet.progress.level + 1}까지 ${wallet.progress.kmToNextLevel}km",
                     style = MaterialTheme.typography.labelMedium,
                 )
-                VSpace(6.dp)
+                VSpace(8.dp)
                 ProgressBar(wallet.progress.boxFraction)
             }
 
-            BoongCard(Modifier.fillMaxWidth()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    GiftBoxIcon(Modifier.size(64.dp))
-                    HSpace(16.dp)
-                    Column(Modifier.weight(1f)) {
+            // 선물상자 카드 (피그마: 높이 192, 아이콘 86×91, 버튼은 글자 아래)
+            BoongCard(Modifier.fillMaxWidth().height(192.dp), padding = 30.dp) {
+                Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
+                    GiftBoxIcon(Modifier.size(width = 86.dp, height = 91.dp))
+                    HSpace(28.dp)
+                    Column {
                         Text("선물상자 ${wallet.closedBoxes}개", style = MaterialTheme.typography.titleLarge)
+                        VSpace(6.dp)
                         Text(
                             if (wallet.closedBoxes > 0) "주차 중에 열어 보세요" else "안전운전 ${PointRules.GIFT_BOX_EVERY_SAFE_KM}km마다 1개",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
+                        VSpace(14.dp)
+                        BoongButton("열어보기", onOpenGift, enabled = wallet.closedBoxes > 0)
                     }
-                    BoongButton("열어보기", onOpenGift, enabled = wallet.closedBoxes > 0)
                 }
             }
         }

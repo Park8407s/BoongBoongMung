@@ -23,6 +23,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -107,12 +111,20 @@ fun BoongRoot(vm: MainViewModel) {
         Column(
             Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(28.dp))
+                .clip(RoundedCornerShape(22.dp))
                 .background(Boong.Cream)
-                .padding(horizontal = 26.dp, vertical = 18.dp)
+                .padding(start = 26.dp, end = 26.dp, top = 20.dp, bottom = 26.dp)
         ) {
-            // 상단 바
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            // 상단 바 (피그마: 흰 둥근 막대, 높이 64)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Boong.Card)
+                    .padding(horizontal = 30.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
                     "붕붕멍",
                     style = MaterialTheme.typography.headlineMedium,
@@ -128,11 +140,19 @@ fun BoongRoot(vm: MainViewModel) {
                     }
                 }
                 Box(Modifier.weight(1f))
-                Pill { BoneCount(wallet.balance) }
-                HSpace(10.dp)
-                Pill { Text("Lv.${wallet.progress.level}", style = MaterialTheme.typography.titleMedium) }
+                BoneCount(wallet.balance)
+                HSpace(30.dp)
+                Box(
+                    Modifier
+                        .height(36.dp)
+                        .widthIn(min = 100.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Boong.Chip)
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) { Text("Lv.${wallet.progress.level}", fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Boong.Brown) }
             }
-            VSpace(16.dp)
+            VSpace(20.dp)
 
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 // 운행 종료 결과 → 앱을 열면 결과 화면을 먼저 보여준다

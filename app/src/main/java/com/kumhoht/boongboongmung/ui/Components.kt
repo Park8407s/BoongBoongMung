@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,37 +64,37 @@ fun Pill(modifier: Modifier = Modifier, bg: Color = Boong.Chip, content: @Compos
     ) { content() }
 }
 
+/** 뼈다귀 + 숫자. big = 결과 합계 (Jua 40) */
 @Composable
 fun BoneCount(value: Int, prefix: String = "", big: Boolean = false) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        BoneIcon(Modifier.size(if (big) 36.dp else 28.dp))
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        BoneIcon(Modifier.size(width = 46.dp, height = 24.dp))
         Text(
             prefix + value.withComma(),
-            style = if (big) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium,
+            style = if (big) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.labelLarge,
         )
     }
 }
 
-/** 흰 카드 */
+/** 흰 카드 (피그마: 모서리 24, 테두리 없음) */
 @Composable
 fun BoongCard(
     modifier: Modifier = Modifier,
-    padding: Dp = 20.dp,
+    padding: Dp = 30.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier
-            .clip(RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(24.dp))
             .background(Boong.Card)
-            .border(1.dp, Boong.CardLine, RoundedCornerShape(22.dp))
             .padding(padding),
         content = content,
     )
 }
 
-/** 진행 막대 */
+/** 진행 막대 (피그마: 높이 14) */
 @Composable
-fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, color: Color = Boong.Bone, height: Dp = 12.dp) {
+fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, color: Color = Boong.Bone, height: Dp = 14.dp) {
     val f by animateFloatAsState(fraction.coerceIn(0f, 1f), tween(900), label = "progress")
     Box(
         modifier
@@ -112,27 +113,29 @@ fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, color: Color = B
     }
 }
 
-/** 선택 칩 (탭, 카테고리) */
+/** 선택 칩 (탭, 카테고리) — 피그마: 높이 40, 모서리 20, 20sp */
 @Composable
 fun Chip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier
-            .clip(RoundedCornerShape(50))
+            .height(40.dp)
+            .widthIn(min = 96.dp)
+            .clip(RoundedCornerShape(20.dp))
             .background(if (selected) Boong.ChipOn else Boong.Chip)
             .clickable(onClick = onClick)
-            .padding(horizontal = 22.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text,
             color = if (selected) Color.White else Boong.Brown,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium,
         )
     }
 }
 
-/** 진한 갈색 버튼 */
+/** 진한 갈색 버튼 — 피그마: 높이 44, 모서리 22, 20sp */
 @Composable
 fun BoongButton(
     text: String,
@@ -143,29 +146,32 @@ fun BoongButton(
 ) {
     Box(
         modifier
-            .clip(RoundedCornerShape(50))
+            .height(44.dp)
+            .widthIn(min = 150.dp)
+            .clip(RoundedCornerShape(22.dp))
             .background(if (enabled) color else Boong.CardLine)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 28.dp, vertical = 14.dp),
+            .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = if (enabled) Color.White else Boong.BrownSoft, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text, color = if (enabled) Color.White else Boong.BrownSoft, fontSize = 20.sp, fontWeight = FontWeight.Medium)
     }
 }
 
-/** 라벨 + 값 한 줄 */
+/** 라벨 + 값 한 줄 — 피그마: 라벨 22 연갈색, 값 24 진갈색, 줄 높이 약 52 */
 @Composable
 fun LineRow(label: String, value: String, modifier: Modifier = Modifier, strong: Boolean = false) {
-    Row(modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = if (strong) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge)
+    Row(modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = if (strong) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.weight(1f))
-        Text(value, style = if (strong) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge)
+        Text(value, style = MaterialTheme.typography.labelLarge)
     }
 }
 
+/** 구분선 — 피그마: 2px #E8D5BF */
 @Composable
 fun ThinDivider() {
-    Box(Modifier.fillMaxWidth().height(1.dp).background(Boong.CardLine))
+    Box(Modifier.fillMaxWidth().height(2.dp).background(Boong.CardLine))
 }
 
 @Composable

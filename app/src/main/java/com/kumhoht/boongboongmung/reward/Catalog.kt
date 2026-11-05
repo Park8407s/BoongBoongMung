@@ -46,7 +46,7 @@ object Catalog {
         Item("seat_sky", Slot.SEAT, "하늘 카시트", 400, color = 0xFF9CC9EA),
         Item("seat_cushion", Slot.SEAT, "쿠션 카시트", 350, requiredLevel = 3, color = 0xFFF4C99B),
         // 배경 3
-        Item("bg_sky", Slot.BACKGROUND, "맑은 하늘", 0, source = Source.DEFAULT, color = 0xFFDCEBF7, accent = 0xFFC3E2B8),
+        Item("bg_sky", Slot.BACKGROUND, "맑은 하늘", 0, source = Source.DEFAULT, color = 0xFFDCEEF7, accent = 0xFFC3E2B8),
         Item("bg_sunset", Slot.BACKGROUND, "노을 길", 400, requiredLevel = 2, color = 0xFFF8C9A0, accent = 0xFFE59A84),
         Item("bg_night", Slot.BACKGROUND, "밤 도시", 500, requiredLevel = 5, color = 0xFF2E3A5C, accent = 0xFFF4D27A),
     )

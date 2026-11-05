@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,9 +62,10 @@ fun ShopScreen(
         if (selected == null) wardrobe.equipped else wardrobe.equipped + (selected.slot to selected.id)
     }
 
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-        BoongCard(Modifier.weight(0.85f).fillMaxHeight(), padding = 14.dp) {
-            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(16.dp))) {
+    // 피그마 '그림 4. 상점 화면' 1682×1210: 미리보기 카드 : 상점 카드 ≈ 1 : 1.79, 카드 간격 40
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+        BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 20.dp) {
+            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(18.dp))) {
                 PetView(preview, Expression.HAPPY, Modifier.fillMaxSize(), reactKey = "$reactKey/$selectedId")
             }
             VSpace(10.dp)
@@ -79,17 +83,17 @@ fun ShopScreen(
             }
         }
 
-        BoongCard(Modifier.weight(1.25f).fillMaxHeight()) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        BoongCard(Modifier.weight(1.79f).fillMaxHeight(), padding = 30.dp) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                 Slot.entries.forEach { s ->
                     Chip(s.label, s == slot, onClick = { slot = s; selectedId = null })
                 }
             }
-            VSpace(16.dp)
+            VSpace(22.dp)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(27.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
                 modifier = Modifier.weight(1f),
             ) {
                 items(Catalog.bySlot(slot), key = { it.id }) { item ->
@@ -137,20 +141,22 @@ private fun ItemCard(
     locked: Boolean,
     onClick: () -> Unit,
 ) {
-    Column(
+    // 피그마 아이템 카드: 높이 140, 모서리 16, 크림 배경, 테두리 2 (선택 시 4 진갈색), 썸네일 왼쪽·이름과 가격 오른쪽
+    Row(
         Modifier
+            .height(140.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Boong.Cream)
             .border(
-                width = if (selected) 3.dp else 1.dp,
+                width = if (selected) 4.dp else 2.dp,
                 color = if (selected) Boong.Brown else Boong.CardLine,
                 shape = RoundedCornerShape(16.dp),
             )
             .clickable(onClick = onClick)
-            .padding(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.fillMaxWidth().aspectRatio(1.5f), contentAlignment = Alignment.Center) {
+        Box(Modifier.weight(1f).height(100.dp), contentAlignment = Alignment.Center) {
             ItemIcon(item, Modifier.fillMaxSize())
             if (locked && !owned) {
                 Box(
@@ -159,16 +165,20 @@ private fun ItemCard(
                 ) { Text("Lv.${item.requiredLevel}", style = MaterialTheme.typography.titleMedium) }
             }
         }
-        Text(item.name, style = MaterialTheme.typography.bodyLarge)
-        when {
-            equipped -> Text("장착 중", style = MaterialTheme.typography.labelMedium)
-            owned -> Text("보유", style = MaterialTheme.typography.labelMedium)
-            item.source == Source.TITLE -> Text("칭호 보상", style = MaterialTheme.typography.labelMedium)
-            item.price == 0 -> Text("기본", style = MaterialTheme.typography.labelMedium)
-            else -> Row(verticalAlignment = Alignment.CenterVertically) {
-                BoneIcon(Modifier.size(20.dp))
-                HSpace(4.dp)
-                Text(item.price.withComma(), style = MaterialTheme.typography.labelMedium)
+        HSpace(16.dp)
+        Column(Modifier.weight(1f)) {
+            Text(item.name, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = Boong.Brown, maxLines = 1)
+            VSpace(6.dp)
+            when {
+                equipped -> Text("장착 중", fontSize = 17.sp, fontWeight = FontWeight.Medium, color = Boong.Equip)
+                owned -> Text("보유", style = MaterialTheme.typography.bodyMedium)
+                item.source == Source.TITLE -> Text("칭호 보상", style = MaterialTheme.typography.bodyMedium)
+                item.price == 0 -> Text("기본", style = MaterialTheme.typography.bodyMedium)
+                else -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    BoneIcon(Modifier.size(width = 32.dp, height = 17.dp))
+                    HSpace(5.dp)
+                    Text(item.price.withComma(), style = MaterialTheme.typography.bodyMedium)
+                }
             }
         }
     }
