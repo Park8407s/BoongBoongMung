@@ -25,6 +25,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import com.kumhoht.boongboongmung.ui.theme.Jua
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -106,55 +112,47 @@ fun BoongRoot(vm: MainViewModel) {
         return
     }
 
-    Box(Modifier.fillMaxSize()) {
-    Box(Modifier.fillMaxSize().background(Boong.Frame).padding(14.dp)) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(22.dp))
-                .background(Boong.Cream)
-                .padding(start = 26.dp, end = 26.dp, top = 20.dp, bottom = 26.dp)
-        ) {
-            // 상단 바 (피그마: 흰 둥근 막대, 높이 64)
+    Box(Modifier.fillMaxSize().background(Boong.Cream)) {
+        Column(Modifier.fillMaxSize()) {
+            // 상단 바 (v3: 흰 바탕 높이 112, 아래 선 2 #F0E2D3)
+            val resultShown = unseen != null || review != null
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(18.dp))
+                    .height(112.dp)
                     .background(Boong.Card)
-                    .padding(horizontal = 30.dp),
+                    .drawBehind {
+                        drawRect(Boong.CardLine, topLeft = Offset(0f, size.height - 2.dp.toPx()), size = Size(size.width, 2.dp.toPx()))
+                    }
+                    .padding(horizontal = 48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     "붕붕멍",
-                    style = MaterialTheme.typography.headlineMedium,
+                    fontFamily = Jua, fontSize = 48.sp, color = Boong.Brown,
                     modifier = Modifier.combinedClickable(onClick = { vm.select(Tab.HOME) }, onLongClick = { demo = true }),
                 )
-                HSpace(28.dp)
-                val resultShown = unseen != null || review != null
+                HSpace(36.dp)
                 if (!resultShown) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Chip("홈", tab == Tab.HOME, { vm.select(Tab.HOME) })
-                        Chip("꾸미기", tab == Tab.SHOP, { vm.select(Tab.SHOP) })
-                        Chip("기록", tab == Tab.RECORDS, { vm.select(Tab.RECORDS) })
-                    }
+                    val tabs = listOf(Tab.HOME, Tab.SHOP, Tab.RECORDS)
+                    NavTabs(listOf("홈", "상점", "기록"), tabs.indexOf(tab)) { vm.select(tabs[it]) }
+                } else {
+                    Box(Modifier.width(2.dp).height(40.dp).background(Color(0xFFE6D3BF)))
+                    HSpace(28.dp)
+                    Text("운행 종료 · 주차 확인됨", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Boong.BrownSoft)
                 }
                 Box(Modifier.weight(1f))
-                BoneCount(wallet.balance)
-                HSpace(30.dp)
-                Box(
-                    Modifier
-                        .height(36.dp)
-                        .widthIn(min = 100.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Boong.Chip)
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) { Text("Lv.${wallet.progress.level}", fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Boong.Brown) }
+                Pill(padH = 28.dp) {
+                    BoneIcon(Modifier.size(40.dp))
+                    Text(wallet.balance.withComma(), fontSize = 32.sp, fontWeight = FontWeight.Black, color = Boong.Brown)
+                }
+                HSpace(16.dp)
+                Pill(bg = Boong.Brown) {
+                    Text("Lv.${wallet.progress.level}", fontFamily = Jua, fontSize = 32.sp, color = Boong.Cream)
+                }
             }
-            VSpace(20.dp)
 
-            Box(Modifier.weight(1f).fillMaxWidth()) {
+            Box(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 48.dp, vertical = 36.dp)) {
                 // 운행 종료 결과 → 앱을 열면 결과 화면을 먼저 보여준다
                 val resultTrip = review ?: unseen
                 when {
@@ -227,6 +225,5 @@ fun BoongRoot(vm: MainViewModel) {
             onConfirm = { askShutdown = false; DriveService.shutdown(activity) },
             onCancel = { askShutdown = false },
         )
-    }
     }
 }

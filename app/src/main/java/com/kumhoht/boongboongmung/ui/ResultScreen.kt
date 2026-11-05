@@ -15,13 +15,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,8 +30,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kumhoht.boongboongmung.data.BoongRepository
 import com.kumhoht.boongboongmung.data.TripEntity
 import com.kumhoht.boongboongmung.reward.Levels
@@ -41,11 +43,15 @@ import com.kumhoht.boongboongmung.reward.Slot
 import com.kumhoht.boongboongmung.ui.pet.Expression
 import com.kumhoht.boongboongmung.ui.pet.PetView
 import com.kumhoht.boongboongmung.ui.theme.Boong
+import com.kumhoht.boongboongmung.ui.theme.Jua
 import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
- * 운행 종료 결과 화면: 붕붕이와 만나는 핵심 순간 (1~2초 연출).
- * 포인트 카운트업 → 선물상자 도착 → 레벨업 순으로 보여준다. 감점 표시는 없다.
+ * 운행 종료 결과 — 디자인 캔버스 v3 '운행 종료 결과'.
+ * 줄이 하나씩 나타나고 합계가 올라간 뒤, 선물상자·레벨업이 뜬다. 감점 표시는 없다.
  */
 @Composable
 fun ResultScreen(
@@ -61,94 +67,113 @@ fun ResultScreen(
     var showExtras by remember(trip.id) { mutableStateOf(false) }
 
     LaunchedEffect(trip.id) {
-        // 줄이 하나씩 나타나고 합계가 올라간다
         for (i in lines.indices) { delay(180); shownLines.value = i + 1 }
         total.animateTo(trip.points.toFloat(), tween(1100, easing = FastOutSlowInEasing))
         showExtras = true
     }
 
-    // 피그마 '그림 2. 운행 종료 결과 화면' 1682×1210: 캐릭터 카드 : 결과 카드 ≈ 1 : 1.34, 카드 간격 40
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
-        BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 20.dp) {
-            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(18.dp))) {
-                PetView(equipped, Expression.SURPRISED, Modifier.fillMaxSize(), reactKey = trip.id)
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+        // 왼쪽: 반짝이는 창밖 풍경 + 놀란 붕붕이 + 한마디
+        Box(Modifier.width(820.dp).fillMaxHeight().clip(RoundedCornerShape(44.dp))) {
+            PetView(equipped, Expression.SURPRISED, Modifier.fillMaxSize(), reactKey = trip.id, sparkles = true)
+            SpeechBubble(Modifier.align(Alignment.TopCenter).padding(start = 48.dp, end = 48.dp, top = 48.dp).fillMaxWidth(), tailCenter = true) {
+                Text(
+                    trip.feedback, fontSize = 40.sp, fontWeight = FontWeight.Black, color = Boong.Brown,
+                    lineHeight = 52.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                )
             }
-            VSpace(20.dp)
-            Text(
-                trip.feedback,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-            )
         }
 
-        BoongCard(Modifier.weight(1.34f).fillMaxHeight(), padding = 40.dp) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("오늘의 드라이브", style = MaterialTheme.typography.headlineSmall)
-                if (trip.replay) {
-                    HSpace(12.dp)
-                    Pill(bg = Boong.Chip) { Text("주행 로그 재생", style = MaterialTheme.typography.labelMedium) }
+        // 오른쪽: 결과 카드
+        BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 0.dp, radius = 44.dp) {
+            Column(Modifier.fillMaxSize().padding(start = 48.dp, end = 48.dp, top = 44.dp, bottom = 40.dp)) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text("오늘의 드라이브", fontFamily = Jua, fontSize = 54.sp, color = Boong.Brown)
+                    HSpace(18.dp)
+                    Text(timeRange(trip), fontSize = 26.sp, color = Boong.Muted, modifier = Modifier.padding(bottom = 10.dp))
+                    if (trip.replay) {
+                        Box(Modifier.weight(1f))
+                        Pill(height = 44.dp, padH = 18.dp) { Text("로그 재생", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Boong.ChipText, softWrap = false) }
+                    }
                 }
-            }
-            VSpace(14.dp)
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                lines.take(shownLines.value).forEach { l ->
-                    LineRow(l.label, "+${l.points}")
-                    ThinDivider()
-                }
-                if (lines.isEmpty()) {
-                    Text("짧은 운행이었어요. 다음엔 조금 더 달려 볼까요?", style = MaterialTheme.typography.bodyLarge, color = Boong.BrownSoft)
+                Column(Modifier.weight(1f).padding(top = 16.dp, bottom = 24.dp).verticalScroll(rememberScrollState())) {
+                    lines.take(shownLines.value).forEach { l -> ResultLine(l.label, l.points) }
+                    if (lines.isEmpty()) {
+                        Text("짧은 운행이었어요. 다음엔 조금 더 달려 볼까요?", fontSize = 28.sp, color = Boong.BrownSoft, modifier = Modifier.padding(top = 12.dp))
+                    }
+                    AnimatedVisibility(showExtras && trip.levelAfter > trip.levelBefore, enter = fadeIn() + scaleIn()) {
+                        Row(
+                            Modifier.padding(top = 18.dp).fillMaxWidth().clip(RoundedCornerShape(30.dp))
+                                .background(Boong.GoodBg).padding(horizontal = 24.dp, vertical = 18.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            BoongIcon(Icon.Star, Boong.Good, Modifier.size(40.dp))
+                            HSpace(16.dp)
+                            Text("레벨 업! Lv.${trip.levelAfter} · ${Levels.titleFor(trip.levelAfter)}", fontFamily = Jua, fontSize = 34.sp, color = Boong.Good)
+                        }
+                    }
                 }
                 AnimatedVisibility(showExtras && trip.giftBoxes > 0, enter = fadeIn() + scaleIn()) {
                     Row(
-                        Modifier
-                            .padding(top = 12.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Boong.Chip)
-                            .padding(12.dp),
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Boong.Chip)
+                            .padding(start = 24.dp, top = 16.dp, bottom = 16.dp, end = 18.dp),
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
-                        GiftBoxIcon(Modifier.size(44.dp))
-                        HSpace(12.dp)
-                        Text("선물상자 ${trip.giftBoxes}개 도착!", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                        BoongButton("열기", onOpenGift, enabled = wallet.closedBoxes > 0)
+                        GiftBoxIcon(Modifier.size(48.dp))
+                        Text("선물상자 ${trip.giftBoxes}개 도착!", fontFamily = Jua, fontSize = 36.sp, color = Boong.Brown, modifier = Modifier.weight(1f))
+                        BoongButton("열기", onOpenGift, enabled = wallet.closedBoxes > 0, height = 64.dp, fontSize = 30, padH = 40.dp)
                     }
                 }
-                AnimatedVisibility(showExtras && trip.levelAfter > trip.levelBefore, enter = fadeIn() + scaleIn()) {
-                    Row(
-                        Modifier
-                            .padding(top = 12.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Boong.Bone.copy(alpha = 0.3f))
-                            .padding(14.dp),
-                    ) {
-                        Text(
-                            "레벨 업! Lv.${trip.levelAfter} · ${Levels.titleFor(trip.levelAfter)}",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
+                // 합계
+                Row(Modifier.padding(top = 22.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("합계", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Boong.Brown)
+                    Box(Modifier.weight(1f))
+                    BoneCount(total.value.toInt(), prefix = "+", big = true)
                 }
-            }
-            VSpace(8.dp)
-            // 합계 (피그마: '합계' 26 Medium, 뼈다귀 + Jua 40)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("합계", fontSize = 26.sp, fontWeight = FontWeight.Medium, color = Boong.Brown)
-                Box(Modifier.weight(1f))
-                BoneCount(total.value.toInt(), prefix = "+", big = true)
-            }
-            VSpace(10.dp)
-            ProgressBar(wallet.progress.boxFraction)
-            VSpace(8.dp)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    "다음 선물상자까지 ${wallet.progress.kmToNextBox}km · Lv.${wallet.progress.level + 1}까지 ${wallet.progress.kmToNextLevel}km",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.weight(1f),
-                )
-                BoongButton("확인", onConfirm)
+                ProgressBar(wallet.progress.boxFraction, Modifier.padding(top = 12.dp), height = 18.dp)
+                Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("다음 선물상자까지 ${wallet.progress.kmToNextBox}km", fontSize = 26.sp, color = Boong.BrownSoft)
+                        Text("Lv.${wallet.progress.level + 1}까지 ${wallet.progress.kmToNextLevel}km", fontSize = 26.sp, color = Boong.BrownSoft)
+                    }
+                    BoongButton("확인", onConfirm, height = 76.dp, fontSize = 34, padH = 64.dp)
+                }
             }
         }
     }
+}
+
+@Composable
+private fun ResultLine(label: String, points: Int) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .drawBehind {
+                val h = 2.dp.toPx()
+                drawRect(Boong.Divider, topLeft = Offset(0f, size.height - h), size = androidx.compose.ui.geometry.Size(size.width, h))
+            }
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        IconTile(iconFor(label), 56.dp, 32.dp, Boong.Chip, Boong.ChipText)
+        Text(label, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = Boong.Brown, modifier = Modifier.weight(1f))
+        Text("+$points", fontFamily = Jua, fontSize = 40.sp, color = Boong.Brown)
+    }
+}
+
+private fun iconFor(label: String): Icon = when {
+    label.startsWith("주행") -> Icon.Road
+    label.startsWith("부드러운") -> Icon.Wave
+    label.startsWith("규정") -> Icon.Gauge
+    label.startsWith("목적지") -> Icon.Flag
+    label.startsWith("안전벨트") -> Icon.Belt
+    else -> Icon.Star
+}
+
+private fun timeRange(t: TripEntity): String {
+    val f = SimpleDateFormat("a h:mm", Locale.KOREA)
+    val end = SimpleDateFormat("h:mm", Locale.KOREA)
+    return "${f.format(Date(t.startAt))} – ${end.format(Date(t.endAt))}"
 }

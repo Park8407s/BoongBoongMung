@@ -1,6 +1,5 @@
 package com.kumhoht.boongboongmung.ui.pet
 
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -23,64 +22,32 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import com.kumhoht.boongboongmung.R
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.vector.PathParser
 import com.kumhoht.boongboongmung.reward.Catalog
 import com.kumhoht.boongboongmung.reward.Item
 import com.kumhoht.boongboongmung.reward.Slot
 import com.kumhoht.boongboongmung.ui.theme.Boong
 import kotlin.math.min
-import kotlin.math.roundToInt
 
-/** 붕붕이 표정 4종 (피그마 '붕붕이' 컴포넌트) */
-enum class Expression(@DrawableRes val art: Int) {
-    DEFAULT(R.drawable.pet_basic),      // 기본
-    HAPPY(R.drawable.pet_happy),        // 반가워요
-    SLEEPY(R.drawable.pet_sleepy),      // 꾸벅꾸벅
-    SURPRISED(R.drawable.pet_gift),     // 선물 받았어요
-}
-
-/** 피그마 일러스트가 있는 아이템. 없는 아이템은 Canvas 로 그린다. */
-@DrawableRes
-private fun itemArt(id: String): Int? = when (id) {
-    "hat_straw" -> R.drawable.item_hat_straw
-    "glasses_sun" -> R.drawable.item_glasses_sun
-    "scarf_blue" -> R.drawable.item_scarf_blue
-    else -> null
-}
+/** 붕붕이 표정 4종 (v3: basic · happy · sleepy · wow) */
+enum class Expression { DEFAULT, HAPPY, SLEEPY, SURPRISED }
 
 /**
- * 피그마 일러스트(300×260)를 200×200 가상 좌표에 놓는 위치.
- * 일러스트의 머리(208×180, 중심 150,128)를 Canvas 머리(108×92, 중심 100,90)에 맞춰서
- * Canvas 로 그리는 모자·안경도 같은 자리에 겹쳐지게 한다.
- */
-private const val ART_SCALE = 1.94f
-private const val ART_LEFT = 100f - 150f / ART_SCALE
-private const val ART_TOP = 90f - 128f / ART_SCALE
-private const val ART_W = 300f / ART_SCALE
-private const val ART_H = 260f / ART_SCALE
-private const val ART_BOTTOM = ART_TOP + ART_H
-
-/** 일러스트 몸통이 Canvas 몸통보다 아래에 있어서 Canvas 목도리를 내린다 */
-private const val SCARF_SHIFT = 16f
-
-/**
- * Pet Renderer: 캐릭터·아이템을 레이어로 합성해 그린다.
- * 레이어 순서: 배경 → 카시트 → 캐릭터 일러스트(표정) → 목도리 → 안경 → 모자
+ * Pet Renderer — 디자인 캔버스 '붕붕멍 화면 시안 v3' 의 붕붕이(Pup.dc.html, 400×400 SVG)를 그대로 옮겨 그린다.
+ * 레이어: 배경(창밖 풍경) → 카시트 → 털·머리·귀 → 볼·눈·코·입 → 목도리 → 앞발 → 모자 → 안경
  *
- * 그림은 200×200 가상 좌표로 정의하고 화면 크기에 맞춰 늘린다.
- * 아이템은 피그마 일러스트가 있으면 이미지로, 없으면 Canvas 로 그린다.
+ * v3 에 그림이 있는 아이템(밀짚모자·털모자·동그란 안경·목도리)은 v3 모양으로,
+ * 나머지(베레모·왕관·고깔·캡모자·선글라스·리본·카시트)는 기존 Canvas 그림을 v3 머리 크기에 맞춰 겹친다.
  *
  * @param reactKey 값이 바뀔 때마다 통통 튀는 반응 (아이템 장착 등)
+ * @param sparkles 결과 화면의 반짝이 별 3개
  */
 @Composable
 fun PetView(
@@ -89,6 +56,7 @@ fun PetView(
     modifier: Modifier = Modifier,
     reactKey: Any? = null,
     showBackground: Boolean = true,
+    sparkles: Boolean = false,
 ) {
     val idle = rememberInfiniteTransition(label = "idle")
     val breath by idle.animateFloat(
@@ -103,65 +71,276 @@ fun PetView(
             bounce.animateTo(0f, spring(dampingRatio = 0.35f, stiffness = Spring.StiffnessMediumLow))
         }
     }
-
     val items = remember(equipped) { equipped.mapValues { Catalog.item(it.value) } }
-    val petArt = ImageBitmap.imageResource(expression.art)
-    val scarfArt = items[Slot.SCARF]?.let { itemArt(it.id) }?.let { ImageBitmap.imageResource(it) }
-    val glassesArt = items[Slot.GLASSES]?.let { itemArt(it.id) }?.let { ImageBitmap.imageResource(it) }
-    val hatArt = items[Slot.HAT]?.let { itemArt(it.id) }?.let { ImageBitmap.imageResource(it) }
 
     Canvas(modifier) {
-        val p = PetSpace.fit(size)
-        if (showBackground) drawBackground(items[Slot.BACKGROUND], size)
-
-        val dy = bounce.value + (if (expression == Expression.SLEEPY) breath * 3f else breath * 1.5f)
-        val pet = p.copy(top = p.top + dy * p.s)
-        items[Slot.SEAT]?.let { drawSeat(p, it) }
-        drawArt(pet, petArt)
-        items[Slot.SCARF]?.let { item ->
-            if (scarfArt != null) drawArt(pet, scarfArt)
-            else drawScarf(pet.copy(top = pet.top + SCARF_SHIFT * pet.s), item)
-        }
-        items[Slot.GLASSES]?.let { item -> if (glassesArt != null) drawArt(pet, glassesArt) else drawGlasses(pet, item) }
-        items[Slot.HAT]?.let { item -> if (hatArt != null) drawArt(pet, hatArt) else drawHat(pet, item) }
+        if (showBackground) drawScene(items[Slot.BACKGROUND], size)
+        if (sparkles) drawSparkles(size)
+        // v3: 붕붕이는 장면 높이의 약 68% 크기로, 바닥에서 4.5% 띄워 가운데에 앉는다
+        val s = if (showBackground) min(size.height * 0.68f, size.width * 0.86f) else min(size.width, size.height)
+        val bottomGap = if (showBackground) size.height * 0.045f else 0f
+        val k = s / 400f
+        val dy = (bounce.value + breath * (if (expression == Expression.SLEEPY) 3f else 1.5f)) * k * 2.5f
+        withTransform({
+            translate(left = (size.width - s) / 2f, top = size.height - bottomGap - s + dy)
+            scale(k, k, Offset.Zero)
+        }) { drawPup(expression, items) }
     }
 }
 
-/** 상점 아이템 아이콘 (아이템만 따로 그린다) */
+/** 상점 아이템 썸네일 */
 @Composable
 fun ItemIcon(item: Item, modifier: Modifier = Modifier) {
-    val art = itemArt(item.id)?.let { ImageBitmap.imageResource(it) }
     Canvas(modifier.clipToBounds()) {
         if (item.slot == Slot.BACKGROUND) {
-            drawBackground(item, size, corner = size.minDimension * 0.15f)
+            drawScene(item, size, compact = true)
             return@Canvas
         }
-        // 아이템 그림이 차지하는 범위(가상 좌표)를 칸 안에 꼭 맞게 넣는다
-        val b = iconBounds(item.slot, art != null)
-        val s = min(size.width / b.width, size.height / b.height) * 0.85f
-        val p = PetSpace(left = size.width / 2f - b.center.x * s, top = size.height / 2f - b.center.y * s, s = s)
-        if (art != null) {
-            drawArt(p, art)
+        // v3 썸네일(120×120)이 있는 모자
+        thumbnailOf(item)?.let { thumb ->
+            val k = min(size.width, size.height) / 120f * 0.92f
+            withTransform({
+                translate((size.width - 120f * k) / 2f, (size.height - 120f * k) / 2f)
+                scale(k, k, Offset.Zero)
+            }) { thumb(item) }
             return@Canvas
         }
-        when (item.slot) {
-            Slot.HAT -> drawHat(p, item)
-            Slot.GLASSES -> drawGlasses(p, item)
-            Slot.SCARF -> drawScarf(p, item)
-            Slot.SEAT -> drawSeat(p, item)
-            Slot.BACKGROUND -> Unit
+        // 나머지: 머리 위에 얹는 그림만 잘라 크게 보여 준다 (v3 400 좌표 범위)
+        val b = onHeadBounds(item)
+        val k = min(size.width / b.width, size.height / b.height) * 0.85f
+        withTransform({
+            translate(size.width / 2f - b.center.x * k, size.height / 2f - b.center.y * k)
+            scale(k, k, Offset.Zero)
+        }) { drawItemOnly(item) }
+    }
+}
+
+// ------------------------------------------------------------------ v3 붕붕이 (400×400 좌표)
+
+private val Ink = Color(0xFF3E2A1F)
+private val Mouth = Color(0xFFEE8E92)
+private val Zz = Color(0xFF7A5C48)
+private val PupStroke = Stroke(width = 7f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+
+private val pathCache = HashMap<String, Path>()
+/** SVG path 문자열 → Compose Path (한 번 만들어 재사용) */
+private fun svg(d: String): Path = pathCache.getOrPut(d) { PathParser().parsePathString(d).toPath() }
+
+private fun DrawScope.ovalWithLine(c: Offset, rx: Float, ry: Float, fill: Color, stroke: Stroke = PupStroke) {
+    val tl = Offset(c.x - rx, c.y - ry)
+    val sz = Size(rx * 2, ry * 2)
+    drawOval(fill, tl, sz)
+    drawOval(Boong.Outline, tl, sz, style = stroke)
+}
+
+private fun DrawScope.pathWithLine(d: String, fill: Color, stroke: Stroke = PupStroke) {
+    val p = svg(d)
+    drawPath(p, fill)
+    drawPath(p, Boong.Outline, style = stroke)
+}
+
+/** 기존 Canvas 아이템(200 가상 좌표)을 v3 머리에 맞추는 좌표계: 머리 중심 (100,90)→(200,228), 1 → 2.81 */
+private val OLD = PetSpace(left = 200f - 100f * 2.81f, top = 228f - 90f * 2.81f, s = 2.81f)
+
+private fun DrawScope.drawPup(e: Expression, items: Map<Slot, Item?>) {
+    items[Slot.SEAT]?.let { drawSeat(OLD, it) }
+
+    // 정수리 털 → 머리 → 처진 귀
+    for ((cx, cy, r) in listOf(Triple(161f, 104f, 28f), Triple(239f, 104f, 28f), Triple(200f, 88f, 32f))) {
+        ovalWithLine(Offset(cx, cy), r, r, Color.White)
+    }
+    ovalWithLine(Offset(200f, 228f), 152f, 136f, Color.White)
+    rotate(16f, pivot = Offset(60f, 240f)) { ovalWithLine(Offset(60f, 240f), 46f, 80f, Boong.Ear) }
+    rotate(-16f, pivot = Offset(340f, 240f)) { ovalWithLine(Offset(340f, 240f), 46f, 80f, Boong.Ear) }
+
+    // 볼 (귀와 겹치지 않게 안쪽)
+    drawOval(Boong.Cheek, Offset(112f, 264f), Size(40f, 24f))
+    drawOval(Boong.Cheek, Offset(248f, 264f), Size(40f, 24f))
+
+    // 눈
+    val thick = Stroke(width = 9f, cap = StrokeCap.Round)
+    when (e) {
+        Expression.DEFAULT -> for (x in listOf(150f, 250f)) {
+            drawCircle(Ink, 18f, Offset(x, 232f)); drawCircle(Color.White, 6.5f, Offset(x - 7f, 225f))
+        }
+        Expression.SURPRISED -> for (x in listOf(150f, 250f)) {
+            drawCircle(Ink, 22f, Offset(x, 232f)); drawCircle(Color.White, 8f, Offset(x - 8f, 223f))
+            drawCircle(Color.White, 4f, Offset(x + 7f, 241f))
+        }
+        Expression.HAPPY -> { drawPath(svg("M131 240 q19 -24 38 0"), Ink, style = thick); drawPath(svg("M231 240 q19 -24 38 0"), Ink, style = thick) }
+        Expression.SLEEPY -> { drawPath(svg("M131 234 q19 13 38 0"), Ink, style = thick); drawPath(svg("M231 234 q19 13 38 0"), Ink, style = thick) }
+    }
+    // 코
+    drawOval(Ink, Offset(186f, 252f), Size(28f, 20f))
+    // 입
+    val line6 = Stroke(width = 6f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+    when (e) {
+        Expression.DEFAULT, Expression.SLEEPY -> drawPath(svg("M176 277 q12 14 24 0 q12 14 24 0"), Ink, style = line6)
+        Expression.HAPPY -> { val m = svg("M172 276 q28 42 56 0 z"); drawPath(m, Mouth); drawPath(m, Ink, style = line6) }
+        Expression.SURPRISED -> { drawOval(Mouth, Offset(188f, 278f), Size(24f, 32f)); drawOval(Ink, Offset(188f, 278f), Size(24f, 32f), style = line6) }
+    }
+    // 졸음 z z (글자 대신 같은 모양의 선)
+    if (e == Expression.SLEEPY) {
+        val zs = Stroke(width = 6f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        drawPath(svg("M302 86 h22 l-22 26 h22"), Zz, style = zs)
+        drawPath(svg("M338 54 h16 l-16 18 h16"), Zz, style = zs)
+    }
+
+    // 목도리 (앞발 뒤)
+    items[Slot.SCARF]?.let { item ->
+        if (item.id == "scarf_ribbon") drawScarf(OLD.copy(top = OLD.top + 7f * 2.81f), item)
+        else drawScarfV3(item)
+    }
+
+    // 앞발
+    ovalWithLine(Offset(138f, 372f), 54f, 28f, Color.White)
+    ovalWithLine(Offset(262f, 372f), 54f, 28f, Color.White)
+    val toe = Stroke(width = 5f, cap = StrokeCap.Round)
+    drawPath(svg("M120 360v12 M138 357v15 M156 360v12"), Boong.Outline, style = toe)
+    drawPath(svg("M244 360v12 M262 357v15 M280 360v12"), Boong.Outline, style = toe)
+
+    items[Slot.HAT]?.let { drawHatV3(it) }
+    items[Slot.GLASSES]?.let { drawGlassesV3(it) }
+}
+
+private fun DrawScope.drawScarfV3(item: Item) {
+    val main = Color(item.color)
+    val tail = if (item.accent != item.color) Color(item.accent)
+    else Color(red = main.red * 0.86f, green = main.green * 0.86f, blue = main.blue * 0.86f)
+    pathWithLine("M236 348 L268 346 L278 398 L244 400 Z", tail)
+    pathWithLine("M98 316 C150 352 250 352 302 316 L306 348 C250 384 150 384 94 348 Z", Color(item.color))
+}
+
+private fun DrawScope.drawHatV3(item: Item) {
+    when (item.id) {
+        "hat_straw" -> {
+            ovalWithLine(Offset(200f, 112f), 142f, 28f, Color(0xFFEBC777))
+            pathWithLine("M128 110 C124 42 276 42 272 110 Z", Color(0xFFEBC777))
+            pathWithLine("M130 88 C170 78 230 78 270 88 L272 106 C230 97 170 97 128 106 Z", Color(0xFFE2725B))
+        }
+        "hat_knit" -> {
+            pathWithLine("M106 140 C100 36 300 36 294 140 Z", Color(0xFF8EC1E3))
+            val tl = Offset(98f, 118f); val sz = Size(204f, 40f)
+            drawRoundRect(Color(0xFF6AA6D1), tl, sz, CornerRadius(20f))
+            drawRoundRect(Boong.Outline, tl, sz, CornerRadius(20f), style = PupStroke)
+            ovalWithLine(Offset(200f, 42f), 21f, 21f, Color.White)
+        }
+        else -> drawHat(OLD, item)
+    }
+}
+
+private fun DrawScope.drawGlassesV3(item: Item) {
+    if (item.id == "glasses_round") {
+        val g = Stroke(width = 8f, cap = StrokeCap.Round)
+        drawCircle(Ink, 37f, Offset(150f, 232f), style = g)
+        drawCircle(Ink, 37f, Offset(250f, 232f), style = g)
+        drawPath(svg("M187 226 q13 -10 26 0"), Ink, style = g)
+    } else drawGlasses(OLD, item)
+}
+
+/** 썸네일용: 아이템만 */
+private fun DrawScope.drawItemOnly(item: Item) {
+    when (item.slot) {
+        Slot.HAT -> drawHatV3(item)
+        Slot.GLASSES -> drawGlassesV3(item)
+        Slot.SCARF -> if (item.id == "scarf_ribbon") drawScarf(OLD.copy(top = OLD.top + 7f * 2.81f), item) else drawScarfV3(item)
+        Slot.SEAT -> drawSeat(OLD, item)
+        Slot.BACKGROUND -> Unit
+    }
+}
+
+/** 썸네일용 아이템 범위 (v3 400 좌표) */
+private fun onHeadBounds(item: Item): Rect = when (item.slot) {
+    Slot.HAT -> Rect(58f, 0f, 342f, 150f)
+    Slot.GLASSES -> if (item.id == "glasses_round") Rect(108f, 190f, 292f, 274f) else Rect(105f, 195f, 295f, 265f)
+    Slot.SCARF -> Rect(90f, 300f, 310f, 402f)
+    Slot.SEAT -> Rect(20f, 60f, 380f, 470f)
+    Slot.BACKGROUND -> Rect(0f, 0f, 400f, 400f)
+}
+
+/** v3 상점 썸네일(120×120)이 있는 모자 */
+private fun thumbnailOf(item: Item): (DrawScope.(Item) -> Unit)? {
+    val s4 = Stroke(width = 4f, join = StrokeJoin.Round)
+    return when (item.id) {
+        "hat_straw" -> { _ ->
+            ovalWithLine(Offset(60f, 80f), 52f, 12f, Color(0xFFEBC777), s4)
+            pathWithLine("M32 78 C30 36 90 36 88 78 Z", Color(0xFFEBC777), s4)
+            pathWithLine("M33 64 C50 58 70 58 87 64 L88 74 C70 69 50 69 32 74 Z", Color(0xFFE2725B), s4)
+        }
+        "hat_knit" -> { _ ->
+            pathWithLine("M26 86 C22 30 98 30 94 86 Z", Color(0xFF8EC1E3), s4)
+            drawRoundRect(Color(0xFF6AA6D1), Offset(22f, 74f), Size(76f, 20f), CornerRadius(10f))
+            drawRoundRect(Boong.Outline, Offset(22f, 74f), Size(76f, 20f), CornerRadius(10f), style = s4)
+            ovalWithLine(Offset(60f, 28f), 10f, 10f, Color.White, s4)
+        }
+        "hat_cap" -> { it ->
+            val main = Color(it.color)
+            val dark = Color(red = main.red * 0.85f, green = main.green * 0.85f, blue = main.blue * 0.85f)
+            pathWithLine("M86 80 C100 80 110 84 112 90 L58 90 L58 80 Z", dark, s4)
+            pathWithLine("M26 82 C26 40 94 40 94 82 Z", main, s4)
+            drawCircle(dark, 4f, Offset(60f, 42f))
+        }
+        "hat_crown" -> { _ ->
+            pathWithLine("M24 88 L30 44 L46 64 L60 36 L74 64 L90 44 L96 88 Z", Color(0xFFF7C948), s4)
+            drawCircle(Color(0xFFE2725B), 6f, Offset(60f, 74f))
+        }
+        else -> null
+    }
+}
+
+// ------------------------------------------------------------------ v3 창밖 풍경
+
+/** 하늘·구름·언덕 2겹·바닥. 노을/밤 배경은 기존 그림 위에 바닥만 v3 로 */
+private fun DrawScope.drawScene(item: Item?, size: Size, compact: Boolean = false) {
+    val bg = item ?: Catalog.item(Catalog.DEFAULT_BACKGROUND)!!
+    val w = size.width; val h = size.height
+    val f = if (compact) min(w, h) / 600f else min(1f, w / 900f)   // 구름 크기 비율
+    val groundH = if (compact) h * 0.14f else 92f
+    if (bg.id == "bg_sky") {
+        drawRect(Boong.Sky, size = size)
+        cloud(Offset(w - (70f + 240f) * f, h * 0.166f), f, big = true)
+        cloud(Offset(60f * f, h * 0.32f), f, big = false)
+        val hillBottom = h - groundH + 22f * (groundH / 92f)
+        val hillH = 240f * (if (compact) h / 1026f else 1f)
+        withTransform({ translate(0f, hillBottom - hillH); scale(w / 900f, hillH / 240f, Offset.Zero) }) {
+            drawPath(svg("M0 120 C150 30 300 40 450 110 C600 180 750 60 900 90 L900 240 L0 240 Z"), Color(0xFFC9E5BE))
+            drawPath(svg("M0 175 C200 115 380 150 520 172 C680 196 800 140 900 160 L900 240 L0 240 Z"), Color(0xFFB3D9A5))
+        }
+    } else {
+        drawBackground(bg, size)
+    }
+    drawRect(Boong.Ground, topLeft = Offset(0f, h - groundH), size = Size(w, groundH))
+    drawRect(Boong.GroundTop, topLeft = Offset(0f, h - groundH), size = Size(w, 6f * (groundH / 92f)))
+}
+
+private fun DrawScope.cloud(at: Offset, f: Float, big: Boolean) {
+    val c = Color.White
+    withTransform({ translate(at.x, at.y); scale(f, f, Offset.Zero) }) {
+        if (big) {
+            drawCircle(c, 40f, Offset(70f, 72f)); drawCircle(c, 52f, Offset(125f, 55f)); drawCircle(c, 34f, Offset(180f, 78f))
+            drawRoundRect(c, Offset(40f, 78f), Size(170f, 34f), CornerRadius(17f))
+        } else {
+            val a = 0.85f
+            drawCircle(c, 26f, Offset(45f, 46f), alpha = a); drawCircle(c, 32f, Offset(84f, 34f), alpha = a)
+            drawRoundRect(c, Offset(22f, 48f), Size(108f, 24f), CornerRadius(12f), alpha = a)
         }
     }
 }
 
-/** 슬롯별 아이템 그림 범위 (가상 좌표). art = 피그마 일러스트 기준 */
-private fun iconBounds(slot: Slot, art: Boolean): Rect = when (slot) {
-    Slot.HAT -> if (art) Rect(39f, 23f, 161f, 63f) else Rect(40f, 3f, 160f, 63f)
-    Slot.GLASSES -> if (art) Rect(72f, 87f, 128f, 105f) else Rect(68f, 79f, 132f, 105f)
-    Slot.SCARF -> if (art) Rect(63f, 133f, 137f, 151f) else Rect(61f, 115f, 139f, 157f)
-    Slot.SEAT -> Rect(37f, 33f, 163f, 181f)
-    Slot.BACKGROUND -> Rect(0f, 0f, 200f, 200f)
+/** 결과 화면 반짝이 별 (v3 위치: 장면 1026px 높이 기준) */
+private fun DrawScope.drawSparkles(size: Size) {
+    val star = svg("M0 -22 C4 -6 6 -4 22 0 C6 4 4 6 0 22 C-4 6 -6 4 -22 0 C-6 -4 -4 -6 0 -22 Z")
+    val st = Stroke(width = 2.5f, join = StrokeJoin.Round)
+    val hy = size.height / 1026f
+    for ((x, y, d) in listOf(Triple(70f + 40f, 400f * hy + 40f, 80f), Triple(size.width - 120f - 30f, 330f * hy + 30f, 60f), Triple(size.width - 70f - 22f, 560f * hy + 22f, 44f))) {
+        val k = d / 48f
+        withTransform({ translate(x, y); scale(k, k, Offset.Zero) }) {
+            drawPath(star, Color(0xFFF7B84B)); drawPath(star, Color(0xFF8A4B12), style = st)
+        }
+    }
 }
+
+// ------------------------------------------------------------------ 기존 Canvas 아이템 좌표계 (200 가상 좌표)
 
 /** 200×200 가상 좌표 → 화면 좌표 */
 internal data class PetSpace(val left: Float, val top: Float, val s: Float) {
@@ -170,24 +349,6 @@ internal data class PetSpace(val left: Float, val top: Float, val s: Float) {
     fun o(x: Float, y: Float) = Offset(x(x), y(y))
     fun sz(w: Float, h: Float) = Size(w * s, h * s)
     fun r(v: Float) = v * s
-
-    companion object {
-        /** 캔버스 아래쪽 가운데에 붕붕이를 앉힌다 (모자 꼭대기 y=4 ~ 일러스트 바닥) */
-        fun fit(size: Size): PetSpace {
-            val s = min(size.width / 175f, size.height / (ART_BOTTOM - 4f + 6f))
-            return PetSpace(left = size.width / 2f - 100f * s, top = size.height - ART_BOTTOM * s, s = s)
-        }
-    }
-}
-
-/** 피그마 일러스트를 캐릭터 자리에 그린다 (아이템도 같은 틀로 만들어져 있어 그대로 겹친다) */
-private fun DrawScope.drawArt(p: PetSpace, img: ImageBitmap) {
-    drawImage(
-        img,
-        dstOffset = IntOffset(p.x(ART_LEFT).roundToInt(), p.y(ART_TOP).roundToInt()),
-        dstSize = IntSize(p.r(ART_W).roundToInt(), p.r(ART_H).roundToInt()),
-        filterQuality = FilterQuality.High,
-    )
 }
 
 private val outline get() = Boong.Line
