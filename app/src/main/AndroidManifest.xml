@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+
+    <!-- Pleos Vehicle SDK: 기어·브레이크·누적 주행거리(CAR_DRIVE) -->
+    <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />
+    <!-- Pleos Vehicle SDK: 안전벨트 미착용 경고(CAR_SAFETY)·좌석별 체결 상태(CAR_SEATS) — 개발자 확인용 -->
+    <uses-permission android:name="pleos.car.permission.CAR_SAFETY" />
+    <!-- 경고등(Telltale) 조회: 안전벨트 경고등 (가상 콘솔 Safety > Telltales > Seat Belt) -->
+    <uses-permission android:name="pleos.car.permission.PRIVATE_CAR_SAFETY" />
+    <uses-permission android:name="pleos.car.permission.CAR_SEATS" />
+    <!-- Pleos NaviHelper: 경로 시작·목적지 도착·현재 도로 제한속도(NAVI_ROUTE) -->
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
+    <!-- AAOS 표준 차량 API: 차속(CAR_SPEED), 기어(CAR_POWERTRAIN) -->
+    <uses-permission android:name="android.car.permission.CAR_SPEED" />
+    <uses-permission android:name="android.car.permission.CAR_POWERTRAIN" />
+
+    <!-- 주행 중 백그라운드 집계 (화면·소리·헤드업 알림 없음, 조용한 상태 알림만) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:name=".BoongApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BoongBoongMung">
+
+        <!-- 메인 화면. distractionOptimized 를 선언하지 않는다:
+             주행 중에는 플랫폼(CarUxRestrictions)이 앱 화면을 가리고, 주차하면 다시 보인다. -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 주행 데이터 집계 서비스 -->
+        <service
+            android:name=".drive.DriveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="vehicle_safe_driving_telemetry" />
+        </service>
+
+        <!-- 차량 시동(부팅) 시 집계 서비스 시작 -->
+        <receiver
+            android:name=".drive.BootReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

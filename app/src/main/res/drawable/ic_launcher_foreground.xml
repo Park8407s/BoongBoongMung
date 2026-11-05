@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 붕붕이 얼굴 (어댑티브 아이콘 안전 영역 66dp 안) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- 귀 -->
+    <path android:fillColor="#EFD3AE" android:strokeColor="#5A4030" android:strokeWidth="1.6"
+        android:pathData="M30,46 C22,50 22,68 30,72 C36,74 38,62 36,52 Z" />
+    <path android:fillColor="#EFD3AE" android:strokeColor="#5A4030" android:strokeWidth="1.6"
+        android:pathData="M78,46 C86,50 86,68 78,72 C72,74 70,62 72,52 Z" />
+    <!-- 정수리 털 -->
+    <path android:fillColor="#FFFFFF" android:strokeColor="#5A4030" android:strokeWidth="1.6"
+        android:pathData="M44,34 a5,5 0 1,1 10,-2 a5,5 0 1,1 10,2 a4,4 0 1,1 -2,6 L46,40 a4,4 0 1,1 -2,-6 Z" />
+    <!-- 머리 -->
+    <path android:fillColor="#FFFFFF" android:strokeColor="#5A4030" android:strokeWidth="1.8"
+        android:pathData="M54,36 C70,36 80,46 80,58 C80,70 68,78 54,78 C40,78 28,70 28,58 C28,46 38,36 54,36 Z" />
+    <!-- 눈 -->
+    <path android:fillColor="#3B2A20" android:pathData="M43,60 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z" />
+    <path android:fillColor="#3B2A20" android:pathData="M58.6,60 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z" />
+    <!-- 볼 -->
+    <path android:fillColor="#F7B9B9" android:pathData="M36,66 a3.5,2.4 0 1,0 7,0 a3.5,2.4 0 1,0 -7,0 Z" />
+    <path android:fillColor="#F7B9B9" android:pathData="M65,66 a3.5,2.4 0 1,0 7,0 a3.5,2.4 0 1,0 -7,0 Z" />
+    <!-- 코·입 -->
+    <path android:fillColor="#3B2A20" android:pathData="M52,64 h4 l-2,2.4 Z" />
+    <path android:strokeColor="#5A4030" android:strokeWidth="1.4" android:fillColor="#00000000"
+        android:pathData="M50,68 q2,2 4,0 q2,2 4,0" />
+</vector>
