@@ -22,9 +22,13 @@ android {
 
     buildTypes {
         release {
+            // 공모전 제출용: 디버그 키로 서명해 바로 설치·실행되게 한다.
+            // 앱 마켓 정식 출시 때는 별도 release 키(저장소에 올리지 않음)로 바꾼다.
+            signingConfig = signingConfigs.getByName("debug")
+            // 코드 줄이기(R8 최적화)는 끈다: 켜면 kotlin 라이브러리 클래스 접근 오류(IllegalAccessError)로
+            // 실행하자마자 종료됨 (2026-11-05 에뮬레이터에서 확인). 출시 전 keep 규칙을 정리한 뒤 다시 검토.
             optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+                enable = false
             }
         }
     }

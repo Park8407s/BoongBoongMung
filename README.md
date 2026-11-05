@@ -4,14 +4,39 @@
 출근길도 주말 나들이도 붕붕이와 함께하는 하루가 되고, 기어·브레이크·차속 같은 차량 데이터로 확인한 안전운전만큼 붕붕이가 자랍니다.
 주행 중에는 화면도 소리도 없이 운전에만 집중하고, 주차하면 붕붕이가 오늘의 드라이브를 반겨 줍니다.
 
-## 설치 파일
+## APK 파일
 
-- [`release/BoongBoongMung-v1.0.apk`](release/BoongBoongMung-v1.0.apk) (디버그 빌드, 시연용 adb 치트 포함)
-- 실행 기기: Pleos Connect 에뮬레이터 v2.1.0 (Android Automotive, API 34)
+- 위치: [`apk/금호HT_붕붕멍_release.apk`](apk/금호HT_붕붕멍_release.apk)
+- release 빌드 (공모전 제출용으로 디버그 키 서명)
+
+## 테스트 환경
+
+- 실행 기기: **Pleos Connect 에뮬레이터 v2.1.0** (Android Automotive, API 34)
+- 차량 신호 조작: **Pleos Connect Virtual Console** (아래 '시연 방법' 참고)
+- 앱 창 크기: 1682 × 1210 (160dpi)
+
+## 실행 방법
+
+1. Pleos Connect 에뮬레이터를 켭니다.
+2. APK 를 설치합니다. `-g` 는 차량 권한(차속 등)을 설치할 때 한 번에 허용합니다.
 
 ```bash
-adb install -r -g release/BoongBoongMung-v1.0.apk
+adb install -r -g "apk/금호HT_붕붕멍_release.apk"
 ```
+
+3. 하단 독(앱 목록)에서 붕붕멍 아이콘(강아지 얼굴)을 누릅니다.
+   - `-g` 없이 설치했다면 처음 실행할 때 차속 권한을 '허용'해 주세요.
+4. 화면을 닫아도 백그라운드에서 집계합니다. 완전히 끄려면 기록 탭 → '붕붕멍 끄기'.
+
+**필요한 권한** (매니페스트에 선언, 설치 시 허용)
+
+| 권한 | 용도 |
+|---|---|
+| `android.car.permission.CAR_SPEED`, `CAR_POWERTRAIN` | 차속, 기어 |
+| `pleos.car.permission.CAR_DRIVE` | 기어·브레이크·누적 주행거리 |
+| `pleos.car.permission.NAVI_ROUTE` | 제한속도·목적지 도착 |
+| `pleos.car.permission.CAR_SAFETY`, `PRIVATE_CAR_SAFETY`, `CAR_SEATS` | 안전벨트 |
+| `FOREGROUND_SERVICE`, `RECEIVE_BOOT_COMPLETED` | 주행 중 백그라운드 집계, 시동 시 자동 시작 |
 
 ## 핵심 기능
 
@@ -44,8 +69,9 @@ adb install -r -g release/BoongBoongMung-v1.0.apk
 - Pleos SDK: `ai.pleos.playground:Vehicle:2.3.2`, `ai.pleos.playground:NaviHelper:3.0.5`
 
 ```bash
-./gradlew :app:assembleDebug
-./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleRelease      # 제출용 (app/build/outputs/apk/release/)
+./gradlew :app:assembleDebug        # 개발용 (adb 치트 포함)
+./gradlew :app:testDebugUnitTest    # 단위 테스트 18개
 ```
 
 ## 시연 방법
@@ -56,7 +82,7 @@ adb install -r -g release/BoongBoongMung-v1.0.apk
    - 안전벨트: Emulation Controls > Safety > Telltales > Seat Belt (Off = 맴, On = 안 맴)
 2. **주행 로그 재생 모드**: 앱 상단 '붕붕멍' 제목을 길게 누르기 → 시나리오 1~4 (약 40초)
    - 1 출근길 18km · 2 가족 나들이 60km · 3 초보 운전(급출발·급정지, 안전벨트 늦게 맴) · 4 장거리 + 휴게소 휴식
-3. **adb 치트** (디버그 빌드)
+3. **adb 치트** (디버그 빌드에서만 동작, 제출한 release APK 에는 없음)
 
 ```bash
 adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --es gear D --ef speed 40
