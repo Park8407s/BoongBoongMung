@@ -19,3 +19,6 @@ local.properties
 # 작업용 (저장소에 올리지 않음)
 /BoongBoongMung_project.zip
 /HANDOFF.md
+
+# 제출용으로 따로 만든 압축본 (저장소에는 apk 만 올림)
+/apk/*.zip
