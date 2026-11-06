@@ -87,15 +87,15 @@ fun ResultScreen(
         // 오른쪽: 결과 카드
         BoongCard(Modifier.weight(1f).fillMaxHeight(), padding = 0.dp, radius = 44.dp) {
             Column(Modifier.fillMaxSize().padding(start = 48.dp, end = 48.dp, top = 44.dp, bottom = 40.dp)) {
-                Row(verticalAlignment = Alignment.Bottom) {
+                // 제목 줄: 제목 + (주행 로그 재생으로 만든 운행이면) 오른쪽 끝에 표시. 시간은 아래 줄
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("오늘의 드라이브", fontFamily = Jua, fontSize = 54.sp, color = Boong.Brown)
-                    HSpace(18.dp)
-                    Text(timeRange(trip), fontSize = 26.sp, color = Boong.Muted, modifier = Modifier.padding(bottom = 10.dp))
+                    Box(Modifier.weight(1f))
                     if (trip.replay) {
-                        Box(Modifier.weight(1f))
-                        Pill(height = 44.dp, padH = 18.dp) { Text("로그 재생", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Boong.ChipText, softWrap = false) }
+                        Pill(height = 44.dp, padH = 18.dp) { Text("주행 로그 재생", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Boong.ChipText, softWrap = false) }
                     }
                 }
+                Text(timeRange(trip), fontSize = 26.sp, color = Boong.Muted)
                 Column(Modifier.weight(1f).padding(top = 16.dp, bottom = 24.dp).verticalScroll(rememberScrollState())) {
                     lines.take(shownLines.value).forEach { l -> ResultLine(l.label, l.points) }
                     if (lines.isEmpty()) {
