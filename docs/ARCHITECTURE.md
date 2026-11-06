@@ -26,7 +26,7 @@
 | Safe Driving Evaluator | `drive/SafeDrivingEvaluator.kt` | 판정 시스템 (순수 로직) |
 | Point & Reward Engine | `reward/RewardRules.kt`, `reward/Catalog.kt`(선물상자) | 보상 테이블 (순수 로직) |
 | Shop & Inventory | `data/BoongRepository.kt` (`buy`, `equip`, `openGiftBox`) | 인벤토리 매니저 |
-| Pet Renderer | `ui/pet/PetRenderer.kt` | 레이어 스프라이트 합성 |
+| Pet Renderer | `ui/pet/PetRenderer.kt` (Canvas 벡터, 디자인 시안 v3) | 레이어 스프라이트 합성 |
 | Restriction Guard | `ui/Dialogs.kt` `DrivingGuard` + 매니페스트 | 입력 차단 레이어 |
 | Repository | `data/BoongDatabase.kt`, `data/Entities.kt` | 세이브 시스템 |
 | (집계 실행) | `drive/DriveEngine.kt`, `drive/DriveService.kt` | 게임 루프 + DontDestroyOnLoad |
@@ -42,6 +42,7 @@
 
 - 매니페스트의 `MainActivity` 에 `distractionOptimized` 를 **선언하지 않았다** → 주행 중에는 시스템이 화면을 가린다.
 - 주행 중 집계는 `DriveService`(포그라운드 서비스, specialUse) 가 프로세스를 살려 두고 `DriveEngine` 이 계속한다.
+- 집계는 사용자가 앱(`MainActivity`)을 열 때 시작한다 (기획서의 "출발 전 인사"). 부팅(시동) 자동 시작은 하지 않으며, 앱을 백그라운드로 내리거나 내비를 전체 화면으로 써도 계속된다. 기록 탭 "붕붕멍 끄기"로 완전히 멈춘다.
 
 ## 4. 차량 신호
 
@@ -49,7 +50,7 @@
 |---|---|---|
 | 차속 | AAOS `PERF_VEHICLE_SPEED` (m/s → km/h) | 위험 권한 → 실행 시 사용자 허용 |
 | 기어 | AAOS `GEAR_SELECTION` | Pleos `Gear` (SDK 에서 deprecated, Google 속성 사용 권장) |
-| 브레이크 | Pleos `Brake.registerBrakePedalStatus` | |
+| 브레이크 | Pleos `Brake.registerBrakePedalStatus` | 수신만. 급감속 판정은 차속 변화율 기준 |
 | 누적 주행거리 | Pleos `Odometer.registerDistanceDriven` (실차에서 값이 움직일 때 우선) | 기본은 차속 × 시간 적분 |
 | 제한속도·도착 | Pleos `NaviHelper` `onCurrentRoadSpeedLimit`, `onDestinationArrived` | 에뮬레이터는 재생 모드로 시연 |
 | 주행 규제 | `CarUxRestrictionsManager` | |
