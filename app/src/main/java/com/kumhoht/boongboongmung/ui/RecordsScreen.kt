@@ -111,7 +111,7 @@ fun RecordsScreen(
                 }
                 Box(Modifier.fillMaxWidth().height(4.dp).background(Boong.Nav))
                 VSpace(20.dp)
-                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕멍 끄기", "기록을 멈춰요. 앱을 열면 다시 켜져요.") {
+                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕멍 끄기", "기록과 차량 신호 수신을 멈춰요.\n앱을 열어 붕붕이에게 인사하면 다시 시작돼요.") {
                     OutlineButton("끄기", onShutdown)
                 }
                 VSpace(16.dp)
@@ -148,11 +148,11 @@ private fun TripRow(t: TripEntity, onOpen: (TripEntity) -> Unit) {
 
 @Composable
 private fun SettingRow(icon: Icon, bg: androidx.compose.ui.graphics.Color, tint: androidx.compose.ui.graphics.Color, title: String, desc: String, button: @Composable () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         IconTile(icon, 64.dp, 34.dp, bg, tint, radius = 20.dp)
         Column(Modifier.weight(1f)) {
             Text(title, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Boong.Brown)
-            Text(desc, fontSize = 22.sp, color = Boong.Muted, lineHeight = 30.sp)
+            Text(desc, fontSize = 21.sp, color = Boong.Muted, lineHeight = 29.sp, softWrap = false)
         }
         button()
     }
