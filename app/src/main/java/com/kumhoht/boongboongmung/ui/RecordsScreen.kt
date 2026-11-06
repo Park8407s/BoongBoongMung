@@ -111,7 +111,7 @@ fun RecordsScreen(
                 }
                 Box(Modifier.fillMaxWidth().height(4.dp).background(Boong.Nav))
                 VSpace(20.dp)
-                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕멍 끄기", "기록과 차량 신호 수신을 멈춰요. 앱을 다시 열면 다시 켜져요.") {
+                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕멍 끄기", "기록을 멈춰요. 앱을 열면 다시 켜져요.") {
                     OutlineButton("끄기", onShutdown)
                 }
                 VSpace(16.dp)
