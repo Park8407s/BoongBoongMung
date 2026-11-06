@@ -36,7 +36,7 @@ adb install -r -g "apk/금호HT_붕붕멍_release.apk"
 | `pleos.car.permission.CAR_DRIVE` | 기어·브레이크·누적 주행거리 |
 | `pleos.car.permission.NAVI_ROUTE` | 제한속도·목적지 도착 |
 | `pleos.car.permission.CAR_SAFETY`, `PRIVATE_CAR_SAFETY`, `CAR_SEATS` | 안전벨트 |
-| `FOREGROUND_SERVICE`, `RECEIVE_BOOT_COMPLETED` | 주행 중 백그라운드 집계, 시동 시 자동 시작 |
+| `FOREGROUND_SERVICE` | 앱을 연 뒤 백그라운드로 내려도 운행 집계 유지 (부팅 시 자동 시작 안 함) |
 
 ## 핵심 기능
 

@@ -158,7 +158,7 @@ fun ResetDialog(onConfirm: () -> Unit, onCancel: () -> Unit) = ConfirmDialog(
 @Composable
 fun ShutdownDialog(onConfirm: () -> Unit, onCancel: () -> Unit) = ConfirmDialog(
     title = "붕붕멍을 끌까요?",
-    body = "꺼져 있는 동안은 운전해도 포인트가 쌓이지 않아요.\n다음 시동을 걸거나 앱을 다시 열면 다시 켜져요.",
+    body = "꺼져 있는 동안은 운전해도 포인트가 쌓이지 않아요.\n붕붕멍 앱을 다시 열면 다시 켜져요.",
     confirmText = "끄기",
     onConfirm = onConfirm,
     onCancel = onCancel,

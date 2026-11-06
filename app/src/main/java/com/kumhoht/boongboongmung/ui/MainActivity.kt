@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kumhoht.boongboongmung.drive.DrivePhase
+import com.kumhoht.boongboongmung.BoongApp
 import com.kumhoht.boongboongmung.drive.DriveService
 import com.kumhoht.boongboongmung.drive.GearState
 import com.kumhoht.boongboongmung.reward.Catalog
@@ -63,7 +64,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 앱을 연 순간부터 운행 기록 대기 (붕붕이 '출발 전 인사'). 서비스 시작이 막혀도 앱이 떠 있는 동안은 집계한다
         DriveService.start(this)
+        (application as BoongApp).engine.start()
         requestRuntimePermissions()
         setContent { BoongTheme { BoongRoot(vm) } }
     }

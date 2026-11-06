@@ -22,7 +22,6 @@
     <!-- 주행 중 백그라운드 집계 (화면·소리·헤드업 알림 없음, 조용한 상태 알림만) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".BoongApp"
@@ -58,15 +57,6 @@
                 android:value="vehicle_safe_driving_telemetry" />
         </service>
 
-        <!-- 차량 시동(부팅) 시 집계 서비스 시작 -->
-        <receiver
-            android:name=".drive.BootReceiver"
-            android:exported="true"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

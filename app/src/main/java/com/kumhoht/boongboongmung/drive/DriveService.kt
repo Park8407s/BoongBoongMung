@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -69,7 +68,7 @@ class DriveService : Service() {
         /**
          * 붕붕멍 완전히 끄기: 서비스 정지 → 차량 신호 해제 → 화면 닫기 → 프로세스 종료.
          * 서비스가 START_STICKY 라서 먼저 stopService 로 멈춰야 시스템이 다시 살리지 않는다.
-         * 다음 시동(부팅)이나 앱을 다시 열면 다시 켜진다.
+         * 앱을 다시 열면 다시 켜진다 (부팅 때 자동으로 켜지지 않는다).
          */
         fun shutdown(activity: Activity) {
             activity.stopService(Intent(activity, DriveService::class.java))
@@ -94,9 +93,3 @@ class DriveService : Service() {
     }
 }
 
-/** 차량 시동(부팅) 시 집계 시작 */
-class BootReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) DriveService.start(context)
-    }
-}
