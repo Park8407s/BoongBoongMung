@@ -300,7 +300,7 @@ fun StatTile(value: String, label: String, modifier: Modifier = Modifier, labelF
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (labelFirst) Text(label, fontSize = 24.sp, color = Boong.Muted)
-        Text(value, fontFamily = Jua, fontSize = valueSize.sp, color = Boong.Brown, maxLines = 1)
+        Text(value, fontFamily = Jua, fontSize = (if (value.length > 4) valueSize * 0.8f else valueSize.toFloat()).sp, color = Boong.Brown, maxLines = 1, softWrap = false)
         if (!labelFirst) Text(label, fontSize = 24.sp, color = Boong.Muted)
     }
 }
