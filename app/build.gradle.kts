@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.kumhoht.boongboongmung"
+    namespace = "com.kumhoht.boongboongnyang"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.kumhoht.boongboongmung"
+        applicationId = "com.kumhoht.boongboongnyang"
         minSdk = 28
         targetSdk = 37
         versionCode = 1

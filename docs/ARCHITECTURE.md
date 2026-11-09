@@ -99,12 +99,12 @@
   4. 장거리 2시간 10분 + 휴게소 16분 → 휴식 보너스 +20
 - **adb 치트** (디버그 빌드)
   ```
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --es gear D --ef speed 40
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --ei limit 50
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --ez arrive true
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --es gear P --ef speed 0
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --ei replay 2
-  adb shell am broadcast -a com.kumhoht.boongboongmung.SIM --ez clear true
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --es gear D --ef speed 40
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ei limit 50
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez arrive true
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --es gear P --ef speed 0
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ei replay 2
+  adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez clear true
   ```
 - **로그**: Logcat 에서 `DriveEngine`, `Telemetry` 검색
 - **단위 테스트** (PC, 에뮬레이터 불필요): `./gradlew :app:testDebugUnitTest`
