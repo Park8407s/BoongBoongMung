@@ -174,7 +174,7 @@ fun DemoPanel(
     onClose: () -> Unit,
 ) {
     Overlay(onClose) {
-        BoongCard(Modifier.width(900.dp), padding = 24.dp) {
+        BoongCard(Modifier.width(1080.dp), padding = 28.dp) {
             Row {
                 Column(Modifier.weight(1.2f)) {
                     Text("주행 로그 재생 모드", style = MaterialTheme.typography.titleLarge)

@@ -22,3 +22,4 @@ local.properties
 
 # 제출용으로 따로 만든 압축본 (저장소에는 apk 만 올림)
 /apk/*.zip
+/demo_video/

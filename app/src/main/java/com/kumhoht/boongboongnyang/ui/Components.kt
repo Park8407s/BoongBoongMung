@@ -286,9 +286,10 @@ fun OutlineButton(text: String, onClick: () -> Unit, color: Color = Boong.Brown,
 @Composable
 fun LineRow(label: String, value: String, modifier: Modifier = Modifier, strong: Boolean = false) {
     Row(modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = if (strong) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge)
-        Spacer(Modifier.weight(1f))
-        Text(value, style = MaterialTheme.typography.labelLarge)
+        // 이름이 길어도 값(수신·대기 등)이 세로로 쪼개지지 않게: 이름이 남는 폭을 쓰고 값은 한 줄 고정
+        Text(label, style = if (strong) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Spacer(Modifier.width(16.dp))
+        Text(value, style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false)
     }
 }
 
