@@ -73,12 +73,12 @@ fun ResultScreen(
     }
 
     Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-        // 왼쪽: 반짝이는 창밖 풍경 + 놀란 붕붕이 + 한마디
+        // 왼쪽: 반짝이는 창밖 풍경 + 놀란 붕붕냥 + 한마디
         Box(Modifier.width(820.dp).fillMaxHeight().clip(RoundedCornerShape(44.dp))) {
             PetView(equipped, Expression.SURPRISED, Modifier.fillMaxSize(), reactKey = trip.id, sparkles = true)
             SpeechBubble(Modifier.align(Alignment.TopCenter).padding(start = 48.dp, end = 48.dp, top = 48.dp).fillMaxWidth(), tailCenter = true) {
                 Text(
-                    trip.feedback, fontSize = 40.sp, fontWeight = FontWeight.Black, color = Boong.Brown,
+                    catSpeech(trip.feedback), fontSize = 40.sp, fontWeight = FontWeight.Black, color = Boong.Brown,
                     lineHeight = 52.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -177,3 +177,9 @@ private fun timeRange(t: TripEntity): String {
     val end = SimpleDateFormat("h:mm", Locale.KOREA)
     return "${f.format(Date(t.startAt))} – ${end.format(Date(t.endAt))}"
 }
+
+/** 붕붕냥으로 바뀌기 전에 저장된 운행의 한마디도 새 이름으로 보여 준다 */
+private fun catSpeech(s: String): String = s
+    .replace("붕붕이가", "붕붕냥이")
+    .replace("붕붕이", "붕붕냥")
+    .replace("목적지까지 안전하게 도착했어요!", "목적지까지 안전하게 도착했다 냥!")

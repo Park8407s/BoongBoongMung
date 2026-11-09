@@ -43,7 +43,7 @@ import com.kumhoht.boongboongmung.ui.theme.Jua
 
 /**
  * 상점 — 디자인 캔버스 v3 '상점'.
- * 왼쪽: 고른 아이템을 입혀 본 붕붕이 / 오른쪽: 분류 탭 · 3열 아이템 카드 · 선택 아이템 구매 막대
+ * 왼쪽: 고른 아이템을 입혀 본 붕붕냥 / 오른쪽: 분류 탭 · 3열 아이템 카드 · 선택 아이템 구매 막대
  */
 @Composable
 fun ShopScreen(
@@ -114,7 +114,7 @@ fun ShopScreen(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text("선택한 아이템", fontSize = 24.sp, color = Boong.ChipText)
-                    Text(selected.name, fontFamily = Jua, fontSize = 42.sp, color = Boong.Brown)
+                    Text(selected.name, fontFamily = Jua, fontSize = if (selected.name.length > 5) 34.sp else 42.sp, color = Boong.Brown, maxLines = 1, softWrap = false)
                 }
                 val canBuy = selected.id !in wardrobe.owned && selected.source != Source.TITLE && selected.price > 0
                 if (canBuy && wallet.progress.level >= selected.requiredLevel) {

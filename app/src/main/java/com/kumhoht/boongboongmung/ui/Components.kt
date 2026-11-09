@@ -305,7 +305,7 @@ fun StatTile(value: String, label: String, modifier: Modifier = Modifier, labelF
     }
 }
 
-/** 붕붕이 말풍선 (v3: 흰 둥근 상자 + 왼쪽 아래 꼬리) */
+/** 붕붕냥 말풍선 (v3: 흰 둥근 상자 + 왼쪽 아래 꼬리) */
 @Composable
 fun SpeechBubble(modifier: Modifier = Modifier, tailCenter: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
     Box(modifier) {

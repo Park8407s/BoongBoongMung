@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 앱을 연 순간부터 운행 기록 대기 (붕붕이 '출발 전 인사'). 서비스 시작이 막혀도 앱이 떠 있는 동안은 집계한다
+        // 앱을 연 순간부터 운행 기록 대기 (붕붕냥 '출발 전 인사'). 서비스 시작이 막혀도 앱이 떠 있는 동안은 집계한다
         DriveService.start(this)
         (application as BoongApp).engine.start()
         requestRuntimePermissions()
@@ -129,7 +129,7 @@ fun BoongRoot(vm: MainViewModel) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    "붕붕멍",
+                    "붕붕냥",
                     fontFamily = Jua, fontSize = 48.sp, color = Boong.Brown,
                     modifier = Modifier.combinedClickable(onClick = { vm.select(Tab.HOME) }, onLongClick = { demo = true }),
                 )

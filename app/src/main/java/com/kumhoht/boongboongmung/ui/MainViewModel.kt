@@ -115,7 +115,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun buy(item: Item) {
         viewModelScope.launch {
             val msg = when (repo.buy(item, System.currentTimeMillis())) {
-                PurchaseResult.Ok -> { _react.value++; "${item.name}을(를) 샀어요! 붕붕이가 좋아해요" }
+                PurchaseResult.Ok -> { _react.value++; "${item.name}을(를) 샀어요! 붕붕냥이 좋아해요" }
                 PurchaseResult.NotEnoughBones -> "뼈다귀가 조금 모자라요. 안전운전으로 모아 볼까요?"
                 PurchaseResult.LevelLocked -> "Lv.${item.requiredLevel}부터 살 수 있어요"
                 PurchaseResult.AlreadyOwned -> "이미 가지고 있어요"
@@ -153,7 +153,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _reviewTrip.value = null
             _tab.value = Tab.HOME
             _react.value++
-            say("데이터를 초기화했어요. 붕붕이와 처음부터 시작해요!")
+            say("데이터를 초기화했어요. 붕붕냥과 처음부터 시작해요!")
         }
     }
 

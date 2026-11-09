@@ -45,8 +45,8 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * 홈 (주차 중) — 디자인 캔버스 v3 '붕붕멍 홈'.
- * 왼쪽: 창밖 풍경 속 붕붕이 + 말풍선 + 안전벨트 칩 / 오른쪽: 레벨 · 최근 드라이브 · 선물상자 · 안내
+ * 홈 (주차 중) — 디자인 캔버스 v3 '붕붕냥 홈'.
+ * 왼쪽: 창밖 풍경 속 붕붕냥 + 말풍선 + 안전벨트 칩 / 오른쪽: 레벨 · 최근 드라이브 · 선물상자 · 안내
  */
 @Composable
 fun HomeScreen(
@@ -75,9 +75,9 @@ fun HomeScreen(
         else -> Expression.DEFAULT
     }
     val line = when {
-        beltWarn -> "출발 전에 안전벨트 매라 멍!"
+        beltWarn -> "출발 전에 안전벨트 매라 냥!"
         needsRest -> "2시간 넘게 달렸어요. 15분 쉬면 휴식 보너스 +${PointRules.REST_BONUS}!"
-        greeting && latest == null -> "안녕하세요! 저는 붕붕이에요"
+        greeting && latest == null -> "안녕하세요! 저는 붕붕냥이에요"
         else -> "오늘도 안전하게 달려요!"
     }
 
@@ -102,7 +102,7 @@ fun HomeScreen(
                 Row(Modifier.padding(horizontal = 30.dp, vertical = 22.dp), verticalAlignment = Alignment.CenterVertically) {
                     BoongIcon(Icon.Steering, Boong.Muted, Modifier.size(40.dp))
                     HSpace(18.dp)
-                    Text("기어를 D로 바꾸면 화면이 꺼지고, 붕붕이가 조용히 주행을 기록해요.", fontSize = 24.sp, color = Boong.BrownSoft, lineHeight = 34.sp)
+                    Text("기어를 D로 바꾸면 화면이 꺼지고, 붕붕냥이 조용히 주행을 기록해요.", fontSize = 24.sp, color = Boong.BrownSoft, lineHeight = 34.sp)
                 }
             }
         }

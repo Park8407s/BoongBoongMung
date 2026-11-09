@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.kumhoht.boongboongmung.R
 
-/** 시안 색상 — 디자인 캔버스 '붕붕멍 화면 시안 v3 (1682×1210)' 기준 */
+/** 시안 색상 — 디자인 캔버스 '붕붕냥' 시안 (v3 화면 구성, 1682×1210) 기준 */
 object Boong {
     val Cream = Color(0xFFFFF7EE)        // 앱 배경
     val Card = Color(0xFFFFFFFF)

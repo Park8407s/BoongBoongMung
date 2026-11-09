@@ -24,7 +24,7 @@ data class Item(
 
 /**
  * 1차 버전 아이템 13종 + 배경 3종. 그래픽은 Pet Renderer 가 레이어로 그린다.
- * 붕붕이·아이템은 모두 Canvas 로 그린다 (디자인 캔버스 v3 시안 기준).
+ * 붕붕냥·아이템은 모두 Canvas 로 그린다 (디자인 캔버스 붕붕냥 시안 기준).
  */
 object Catalog {
     val items: List<Item> = listOf(

@@ -42,7 +42,7 @@ import java.util.Calendar
 
 /**
  * 기록 — 디자인 캔버스 v3 '기록'.
- * 왼쪽: 이번 주(월~일) 요약 + 요일별 막대 / 오른쪽: 최근 기록 목록 + 붕붕멍 끄기·데이터 초기화
+ * 왼쪽: 이번 주(월~일) 요약 + 요일별 막대 / 오른쪽: 최근 기록 목록 + 붕붕냥 끄기·데이터 초기화
  */
 @Composable
 fun RecordsScreen(
@@ -111,7 +111,7 @@ fun RecordsScreen(
                 }
                 Box(Modifier.fillMaxWidth().height(4.dp).background(Boong.Nav))
                 VSpace(20.dp)
-                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕멍 끄기", "기록과 차량 신호 수신을 멈춰요.\n앱을 열어 붕붕이에게 인사하면 다시 시작돼요.") {
+                SettingRow(Icon.Power, Boong.Nav, Boong.Brown, "붕붕냥 끄기", "기록과 차량 신호 수신을 멈춰요.\n앱을 열어 붕붕냥에게 인사하면 다시 시작돼요.") {
                     OutlineButton("끄기", onShutdown)
                 }
                 VSpace(16.dp)

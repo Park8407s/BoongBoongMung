@@ -45,7 +45,7 @@ object Levels {
     /** 레벨 칭호 */
     fun titleFor(level: Int): String = when {
         level >= 10 -> "전설의 드라이버"
-        level >= 8 -> "붕붕이 베프"
+        level >= 8 -> "붕붕냥 베프"
         level >= 5 -> "든든한 보호자"
         level >= 3 -> "산책 친구"
         else -> "새내기 드라이버"
@@ -180,12 +180,12 @@ object RewardCalculator {
     fun feedback(trip: TripSummary): String {
         val ratio = trip.smoothRatio
         return when {
-            trip.arrived -> "목적지까지 안전하게 도착했어요!"
+            trip.arrived -> "목적지까지 안전하게 도착했다 냥!"
             ratio == null -> "오늘도 안전하게 도착했어요!"
-            ratio >= 0.9 -> "정말 부드러운 운전이었어요. 붕붕이가 푹 잤어요!"
+            ratio >= 0.9 -> "정말 부드러운 운전이었어요. 붕붕냥이 푹 잤어요!"
             ratio >= 0.7 -> "오늘도 안전하게 도착했어요!"
             else -> "오늘은 부드러운 운전 구간이 ${(ratio * 100).toInt()}%였어요. " +
-                "다음엔 붕붕이가 편하게 탈 수 있게 천천히 출발해 볼까요?"
+                "다음엔 붕붕냥이 편하게 탈 수 있게 천천히 출발해 볼까요?"
         }
     }
 
