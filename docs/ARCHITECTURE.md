@@ -1,4 +1,4 @@
-# 붕붕멍 코드 구조 설명서
+# 붕붕냥 코드 구조 설명서
 
 > 심사 대비용 문서. 기획서 v03의 '④ 모듈 구성'과 실제 코드를 1:1로 맞춰 정리했다.
 > 유니티 개발 경험을 기준으로 비유를 달았다.
@@ -26,7 +26,7 @@
 | Safe Driving Evaluator | `drive/SafeDrivingEvaluator.kt` | 판정 시스템 (순수 로직) |
 | Point & Reward Engine | `reward/RewardRules.kt`, `reward/Catalog.kt`(선물상자) | 보상 테이블 (순수 로직) |
 | Shop & Inventory | `data/BoongRepository.kt` (`buy`, `equip`, `openGiftBox`) | 인벤토리 매니저 |
-| Pet Renderer | `ui/pet/PetRenderer.kt` (Canvas 벡터, 디자인 시안 v3) | 레이어 스프라이트 합성 |
+| Pet Renderer | `ui/pet/PetRenderer.kt` (Canvas 벡터, 디자인 캔버스 붕붕냥 시안) | 레이어 스프라이트 합성 |
 | Restriction Guard | `ui/Dialogs.kt` `DrivingGuard` + 매니페스트 | 입력 차단 레이어 |
 | Repository | `data/BoongDatabase.kt`, `data/Entities.kt` | 세이브 시스템 |
 | (집계 실행) | `drive/DriveEngine.kt`, `drive/DriveService.kt` | 게임 루프 + DontDestroyOnLoad |
@@ -42,7 +42,7 @@
 
 - 매니페스트의 `MainActivity` 에 `distractionOptimized` 를 **선언하지 않았다** → 주행 중에는 시스템이 화면을 가린다.
 - 주행 중 집계는 `DriveService`(포그라운드 서비스, specialUse) 가 프로세스를 살려 두고 `DriveEngine` 이 계속한다.
-- 집계는 사용자가 앱(`MainActivity`)을 열 때 시작한다 (기획서의 "출발 전 인사"). 부팅(시동) 자동 시작은 하지 않으며, 앱을 백그라운드로 내리거나 내비를 전체 화면으로 써도 계속된다. 기록 탭 "붕붕멍 끄기"로 완전히 멈춘다.
+- 집계는 사용자가 앱(`MainActivity`)을 열 때 시작한다 (기획서의 "출발 전 인사"). 부팅(시동) 자동 시작은 하지 않으며, 앱을 백그라운드로 내리거나 내비를 전체 화면으로 써도 계속된다. 기록 탭 "붕붕냥 끄기"로 완전히 멈춘다.
 
 ## 4. 차량 신호
 
@@ -92,7 +92,7 @@
 
 - **실행**: Android Studio 기기 선택 `Pleos_Connect_v2.1.0` → ▶ Run. 처음 실행 시 차속 권한 허용.
 - **실제 신호로 시연**: Virtual Console → Gear **D** → Speed 올리기(천천히/급하게) → Gear **P** + Speed 0 → 결과 화면
-- **주행 로그 재생 모드**: 상단 **'붕붕멍' 제목을 길게 누르기** → 시나리오 1~4 재생 (약 40초)
+- **주행 로그 재생 모드**: 상단 **'붕붕냥' 제목을 길게 누르기** → 시나리오 1~4 재생 (약 40초)
   1. 출근길 18km (기획서 그림 2와 같은 결과: +18 +15 +10 +10)
   2. 가족 나들이 60km → 선물상자 2개 (15% 확률로 선물상자 전용 선글라스)
   3. 초보 운전 → "부드러운 운전 구간이 n%였어요" 안내
