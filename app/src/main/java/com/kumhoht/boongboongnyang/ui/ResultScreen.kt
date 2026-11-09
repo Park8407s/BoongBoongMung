@@ -129,7 +129,7 @@ fun ResultScreen(
                 Row(Modifier.padding(top = 22.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("합계", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Boong.Brown)
                     Box(Modifier.weight(1f))
-                    BoneCount(total.value.toInt(), prefix = "+", big = true)
+                    FishCount(total.value.toInt(), prefix = "+", big = true)
                 }
                 ProgressBar(wallet.progress.boxFraction, Modifier.padding(top = 12.dp), height = 18.dp)
                 Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {

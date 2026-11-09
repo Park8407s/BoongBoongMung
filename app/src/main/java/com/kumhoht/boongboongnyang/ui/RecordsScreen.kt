@@ -140,7 +140,7 @@ private fun TripRow(t: TripEntity, onOpen: (TripEntity) -> Unit) {
                 fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Boong.Brown,
             )
         }
-        BoneIcon(Modifier.size(36.dp))
+        FishIcon(Modifier.size(36.dp))
         HSpace(8.dp)
         Text("+${t.points.withComma()}", fontFamily = Jua, fontSize = 42.sp, color = Boong.Brown)
     }

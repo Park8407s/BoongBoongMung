@@ -102,8 +102,8 @@ fun GiftDialog(
                     Box(Modifier.fillMaxWidth().scale(pop.value), contentAlignment = Alignment.Center) {
                         when (val r = state.reward) {
                             is GiftReward.Bones -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                BoneIcon(Modifier.size(120.dp))
-                                Text("뼈다귀 +${r.amount}", style = MaterialTheme.typography.headlineMedium)
+                                FishIcon(Modifier.size(120.dp))
+                                Text("생선 +${r.amount}", style = MaterialTheme.typography.headlineMedium)
                             }
                             is GiftReward.ItemReward -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 val item = Catalog.item(r.itemId)
@@ -148,7 +148,7 @@ fun ConfirmDialog(title: String, body: String, confirmText: String, onConfirm: (
 @Composable
 fun ResetDialog(onConfirm: () -> Unit, onCancel: () -> Unit) = ConfirmDialog(
     title = "데이터를 모두 지울까요?",
-    body = "운행 기록, 뼈다귀, 선물상자, 아이템, 칭호, 레벨이 모두 지워지고 처음 상태로 돌아가요.\n지운 데이터는 되돌릴 수 없어요.",
+    body = "운행 기록, 생선, 선물상자, 아이템, 칭호, 레벨이 모두 지워지고 처음 상태로 돌아가요.\n지운 데이터는 되돌릴 수 없어요.",
     confirmText = "초기화",
     onConfirm = onConfirm,
     onCancel = onCancel,

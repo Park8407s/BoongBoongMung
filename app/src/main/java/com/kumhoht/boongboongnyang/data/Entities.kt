@@ -36,7 +36,7 @@ data class TripEntity(
 /** 부드러운 운전 비율(%). 판정 구간이 없으면 null */
 fun TripEntity.smoothPercent(): Int? = if (judgedKm > 0) smoothKm * 100 / judgedKm else null
 
-/** 뼈다귀 포인트 입출금 내역. 잔액 = 합계 */
+/** 생선 포인트 입출금 내역. 잔액 = 합계 */
 @Entity(tableName = "ledger")
 data class LedgerEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -67,7 +67,7 @@ data class GiftBoxEntity(
     val earnedAt: Long,
     val tripId: Long,
     val openedAt: Long? = null,
-    /** "bones:30" 또는 "item:glasses_sun" */
+    /** "bones:30"(생선 30마리, 저장 형식은 예전 이름 유지) 또는 "item:glasses_sun" */
     val reward: String? = null,
 )
 

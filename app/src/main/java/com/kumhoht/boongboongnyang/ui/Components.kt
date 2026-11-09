@@ -90,22 +90,26 @@ fun BoongIcon(icon: Icon, tint: Color, modifier: Modifier = Modifier.size(32.dp)
     }
 }
 
-/** 뼈다귀 포인트 아이콘 (v3: 32×32, -35° 기울임) */
+/** 생선 포인트 아이콘 (붕붕냥: 32×32, 왼쪽을 보는 물고기, 살짝 위로 기울임) */
 @Composable
-fun BoneIcon(modifier: Modifier = Modifier.size(40.dp)) {
-    Canvas(modifier) { drawBone(this) }
+fun FishIcon(modifier: Modifier = Modifier.size(40.dp)) {
+    Canvas(modifier) { drawFish(this) }
 }
 
-private fun drawBone(scope: DrawScope) = with(scope) {
+private fun drawFish(scope: DrawScope) = with(scope) {
     val k = min(size.width, size.height) / 32f
     withTransform({
         translate((size.width - 32f * k) / 2f, (size.height - 32f * k) / 2f)
         scale(k, k, Offset.Zero)
     }) {
-        rotate(-35f, pivot = Offset(16f, 16f)) {
-            val c = Boong.Bone
-            drawRoundRect(c, Offset(8f, 13f), Size(16f, 6f), CornerRadius(2f))
-            for ((x, y) in listOf(8f to 12.6f, 8f to 19.4f, 24f to 12.6f, 24f to 19.4f)) drawCircle(c, 3.4f, Offset(x, y))
+        rotate(-20f, pivot = Offset(16f, 16f)) {
+            val c = Boong.Fish
+            val dark = Color(0xFFC9741C)
+            drawPath(svgPath("M21 16 L31 8 Q28.2 16 31 24 Z"), dark)                  // 꼬리
+            drawPath(svgPath("M1 16 C5.5 6 17.5 5.5 24 16 C17.5 26.5 5.5 26 1 16 Z"), c)      // 몸통
+            drawPath(svgPath("M12.5 10.5 Q15.5 16 12.5 21.5"), dark, style = Stroke(1.8f, cap = StrokeCap.Round))  // 아가미
+            drawCircle(Color.White, 2.4f, Offset(7.2f, 14.4f))                                    // 눈
+            drawCircle(Boong.Brown, 1.4f, Offset(6.8f, 14.4f))
         }
     }
 }
@@ -138,11 +142,11 @@ fun Pill(
     ) { content() }
 }
 
-/** 뼈다귀 + 숫자. big = 결과 합계 (Jua 80) */
+/** 생선 + 숫자. big = 결과 합계 (Jua 80) */
 @Composable
-fun BoneCount(value: Int, prefix: String = "", big: Boolean = false) {
+fun FishCount(value: Int, prefix: String = "", big: Boolean = false) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (big) 12.dp else 8.dp)) {
-        BoneIcon(Modifier.size(if (big) 52.dp else 36.dp))
+        FishIcon(Modifier.size(if (big) 52.dp else 36.dp))
         Text(
             prefix + value.withComma(),
             fontFamily = if (big) Jua else null,

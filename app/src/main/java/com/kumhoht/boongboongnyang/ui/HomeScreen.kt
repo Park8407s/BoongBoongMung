@@ -195,7 +195,7 @@ private fun BonusChip(label: String, points: Int?, modifier: Modifier = Modifier
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     ) {
         Text(label, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = if (on) Boong.BrownSoft else Boong.Dashed, maxLines = 1)
-        Text(if (on) "+$points" else "-", fontFamily = Jua, fontSize = 24.sp, color = if (on) Boong.Bone else Boong.Dashed)
+        Text(if (on) "+$points" else "-", fontFamily = Jua, fontSize = 24.sp, color = if (on) Boong.Fish else Boong.Dashed)
     }
 }
 

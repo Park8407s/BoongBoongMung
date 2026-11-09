@@ -35,7 +35,7 @@ data class Progress(
 
 sealed interface PurchaseResult {
     data object Ok : PurchaseResult
-    data object NotEnoughBones : PurchaseResult
+    data object NotEnoughFish : PurchaseResult
     data object LevelLocked : PurchaseResult
     data object AlreadyOwned : PurchaseResult
     data object NotForSale : PurchaseResult
@@ -191,7 +191,7 @@ class BoongRepository(private val db: BoongDatabase, private val zone: ZoneId = 
         if (item.id in dao.ownedIds()) return@withTransaction PurchaseResult.AlreadyOwned
         val level = Levels.levelFor(loadState().totalSafeKm)
         if (level < item.requiredLevel) return@withTransaction PurchaseResult.LevelLocked
-        if (dao.balance() < item.price) return@withTransaction PurchaseResult.NotEnoughBones
+        if (dao.balance() < item.price) return@withTransaction PurchaseResult.NotEnoughFish
         dao.insertLedger(LedgerEntity(at = now, amount = -item.price, reason = "구매 ${item.name}"))
         dao.insertItem(InventoryEntity(item.id, now, Source.SHOP.name))
         dao.equip(EquippedEntity(item.slot.name, item.id))

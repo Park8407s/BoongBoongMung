@@ -144,7 +144,7 @@ fun BoongRoot(vm: MainViewModel) {
                 }
                 Box(Modifier.weight(1f))
                 Pill(padH = 28.dp) {
-                    BoneIcon(Modifier.size(40.dp))
+                    FishIcon(Modifier.size(40.dp))
                     Text(wallet.balance.withComma(), fontSize = 32.sp, fontWeight = FontWeight.Black, color = Boong.Brown)
                 }
                 HSpace(16.dp)

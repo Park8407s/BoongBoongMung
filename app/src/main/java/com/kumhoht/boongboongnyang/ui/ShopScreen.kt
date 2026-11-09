@@ -151,7 +151,7 @@ private fun ActionButton(
         wallet.progress.level < item.requiredLevel -> BoongButton("Lv.${item.requiredLevel}부터", {}, enabled = false, height = h, fontSize = 34)
         else -> BoongButton(
             "${item.price.withComma()} 구매하기", { onBuy(item) }, enabled = wallet.balance >= item.price, height = h, fontSize = 34,
-            leading = { BoneIcon(Modifier.size(36.dp)) },
+            leading = { FishIcon(Modifier.size(36.dp)) },
         )
     }
 }
@@ -200,7 +200,7 @@ private fun ItemCard(
                 item.source == Source.TITLE -> Text("칭호 보상", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Boong.Muted)
                 item.price == 0 -> Text("기본", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Boong.Muted)
                 else -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BoneIcon(Modifier.size(32.dp))
+                    FishIcon(Modifier.size(32.dp))
                     Text(item.price.withComma(), fontSize = 28.sp, fontWeight = FontWeight.Black, color = Boong.Brown)
                 }
             }

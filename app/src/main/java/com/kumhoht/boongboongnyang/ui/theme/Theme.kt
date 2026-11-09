@@ -25,7 +25,7 @@ object Boong {
     val ChipText = Color(0xFF8A4B12)
     val Nav = Color(0xFFF6EBDF)          // 탭 묶음 배경
     val Accent = Color(0xFFF2A33A)       // 진행바·선택 테두리
-    val Bone = Color(0xFFE8922A)          // 뼈다귀 포인트
+    val Fish = Color(0xFFE8922A)          // 생선 포인트
     val GoodBg = Color(0xFFDDF1EC)
     val Good = Color(0xFF1F6B5C)
     val DangerBg = Color(0xFFFBE4DE)
