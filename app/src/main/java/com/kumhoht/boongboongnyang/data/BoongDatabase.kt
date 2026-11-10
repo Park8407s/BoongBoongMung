@@ -103,7 +103,7 @@ interface BoongDao {
         TripEntity::class, LedgerEntity::class, InventoryEntity::class, EquippedEntity::class,
         GiftBoxEntity::class, TitleEntity::class, KvEntity::class,
     ],
-    version = 1,
+    version = 2,   // 2: 부드러운 운전 거리 Double (0.2km 단위)
     exportSchema = false,
 )
 abstract class BoongDatabase : RoomDatabase() {
@@ -111,6 +111,9 @@ abstract class BoongDatabase : RoomDatabase() {
 
     companion object {
         fun create(context: Context): BoongDatabase =
-            Room.databaseBuilder(context, BoongDatabase::class.java, "boongboongnyang.db").build()
+            Room.databaseBuilder(context, BoongDatabase::class.java, "boongboongnyang.db")
+                // 출시 전 데모 단계라 스키마가 바뀌면 로컬 기록을 새로 만든다
+                .fallbackToDestructiveMigration(dropAllTables = true)
+                .build()
     }
 }

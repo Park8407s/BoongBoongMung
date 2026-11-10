@@ -129,7 +129,7 @@ private fun LevelCard(wallet: Wallet) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("드라이브 레벨", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Boong.Muted)
                 Box(Modifier.weight(1f))
-                Text("누적 안전운전 ${p.state.totalSafeKm}km", fontSize = 24.sp, color = Boong.Muted)
+                Text("누적 안전운전 ${km(p.state.totalSafeKm)}km", fontSize = 24.sp, color = Boong.Muted)
             }
             VSpace(6.dp)
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -140,7 +140,7 @@ private fun LevelCard(wallet: Wallet) {
                 }
             }
             ProgressBar(p.levelFraction, Modifier.padding(vertical = 22.dp))
-            Text("Lv.${p.level + 1}까지 ${p.kmToNextLevel}km 남았어요", fontSize = 26.sp, color = Boong.BrownSoft)
+            Text("Lv.${p.level + 1}까지 ${km(p.kmToNextLevel)}km 남았어요", fontSize = 26.sp, color = Boong.BrownSoft)
         }
     }
 }
@@ -216,7 +216,7 @@ private fun GiftCard(boxes: Int, onOpenGift: () -> Unit) {
         Column(Modifier.weight(1f)) {
             Text("선물상자 ${boxes}개", fontFamily = Jua, fontSize = 42.sp, color = Boong.Brown)
             Text(
-                if (boxes > 0) "안전운전으로 받은 선물이에요" else "안전운전 ${PointRules.GIFT_BOX_EVERY_SAFE_KM}km마다 1개",
+                if (boxes > 0) "안전운전으로 받은 선물이에요" else "안전운전 ${km(PointRules.GIFT_BOX_EVERY_SAFE_KM)}km마다 1개",
                 fontSize = 24.sp, color = Boong.ChipText,
             )
         }
@@ -224,7 +224,12 @@ private fun GiftCard(boxes: Int, onOpenGift: () -> Unit) {
     }
 }
 
-internal fun km(v: Double): String = String.format(Locale.KOREA, if (v < 10) "%.1f" else "%.0f", v)
+/** 10km 미만은 소수 한 자리 (2.0 → "2"), 10km 이상은 정수 */
+internal fun km(v: Double): String {
+    if (v >= 10) return String.format(Locale.KOREA, "%.0f", v)
+    val r = kotlin.math.round(v * 10) / 10.0
+    return if (r == kotlin.math.floor(r)) r.toInt().toString() else String.format(Locale.KOREA, "%.1f", r)
+}
 
 /** '오늘 오전 8:42' / '어제 오후 6:10' / '11월 3일 오전 9:00' */
 internal fun whenText(ms: Long): String {

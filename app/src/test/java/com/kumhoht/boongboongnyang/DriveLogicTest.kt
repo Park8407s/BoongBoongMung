@@ -51,7 +51,7 @@ class DriveLogicTest {
         while (t < 3_600_000L) { t += 500; ev.onSample(s(t, GearState.DRIVE, 60f)) }
         val r = ev.finish(t)
         assertEquals(60.0, r.distanceKm, 0.01)
-        assertEquals(60, r.smoothKm)
+        assertEquals(60.0, r.smoothKm, 0.21)   // 0.2km 구간 판정 (마지막 자투리 구간 오차 허용)
         assertEquals(0, r.harshAccelCount)
     }
 

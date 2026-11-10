@@ -25,8 +25,8 @@ import java.time.ZoneId
 data class Progress(
     val state: ProgressState,
     val level: Int,
-    val kmToNextLevel: Int,
-    val kmToNextBox: Int,
+    val kmToNextLevel: Double,
+    val kmToNextBox: Double,
     /** 다음 레벨까지 진행률 0~1 */
     val levelFraction: Float,
     /** 다음 선물상자까지 진행률 0~1 */
@@ -72,8 +72,8 @@ class BoongRepository(private val db: BoongDatabase, private val zone: ZoneId = 
             level = level,
             kmToNextLevel = RewardCalculator.kmToNextLevel(st.totalSafeKm),
             kmToNextBox = RewardCalculator.kmToNextBox(st.totalSafeKm),
-            levelFraction = ((st.totalSafeKm - cur).toFloat() / (next - cur).coerceAtLeast(1)).coerceIn(0f, 1f),
-            boxFraction = (st.totalSafeKm % box).toFloat() / box,
+            levelFraction = ((st.totalSafeKm - cur) / (next - cur).coerceAtLeast(0.1)).toFloat().coerceIn(0f, 1f),
+            boxFraction = (1.0 - RewardCalculator.kmToNextBox(st.totalSafeKm) / box).toFloat().coerceIn(0f, 1f),
         )
     }
 
@@ -145,13 +145,13 @@ class BoongRepository(private val db: BoongDatabase, private val zone: ZoneId = 
         }
     }
 
-    /** 최근 7일 부드러운 운전 비율 70% 이상(10km 이상) → '부드러운 드라이버' 칭호 + 전용 목도리 */
+    /** 최근 7일 부드러운 운전 비율 70% 이상(시연용 2km 이상) → '부드러운 드라이버' 칭호 + 전용 목도리 */
     private suspend fun checkSmoothDriverTitle(now: Long) {
         val since = now - 7L * 24 * 60 * 60 * 1000
         val recent = dao.tripsSince(since)
         val judged = recent.sumOf { it.judgedKm }
         val smooth = recent.sumOf { it.smoothKm }
-        if (judged >= 10 && smooth * 100 >= judged * 70) {
+        if (judged >= 2.0 - 1e-9 && smooth * 100 >= judged * 70 - 1e-6) {
             val inserted = dao.insertTitle(TitleEntity(Catalog.SMOOTH_TITLE, now))
             if (inserted != -1L) {
                 dao.insertItem(InventoryEntity(Catalog.SMOOTH_TITLE_ITEM, now, Source.TITLE.name))
@@ -224,7 +224,7 @@ class BoongRepository(private val db: BoongDatabase, private val zone: ZoneId = 
     }
 
     private fun decodeState(m: Map<String, String>) = ProgressState(
-        totalSafeKm = m[K_SAFE]?.toIntOrNull() ?: 0,
+        totalSafeKm = m[K_SAFE]?.toDoubleOrNull() ?: 0.0,
         streakDays = m[K_STREAK]?.toIntOrNull() ?: 0,
         lastSafeDay = m[K_LAST_SAFE]?.toIntOrNull() ?: 0,
         lastStreakBonusDay = m[K_LAST_BONUS]?.toIntOrNull() ?: 0,

@@ -90,7 +90,7 @@ fun RecordsScreen(
                 VSpace(24.dp)
                 Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
                     StatTile("${km(weekKm)}km", "주행 거리", Modifier.weight(1f), labelFirst = true, valueSize = 60)
-                    StatTile(if (judged > 0) "${smooth * 100 / judged}%" else "-", "부드러운 운전", Modifier.weight(1f), labelFirst = true, valueSize = 60)
+                    StatTile(if (judged > 1e-9) "${(smooth * 100 / judged + 1e-6).toInt()}%" else "-", "부드러운 운전", Modifier.weight(1f), labelFirst = true, valueSize = 60)
                     StatTile("+${weekPoints.withComma()}", "획득 포인트", Modifier.weight(1f), labelFirst = true, valueSize = 60)
                 }
                 VSpace(24.dp)

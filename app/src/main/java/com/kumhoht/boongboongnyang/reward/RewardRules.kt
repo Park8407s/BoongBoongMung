@@ -5,10 +5,15 @@ import com.kumhoht.boongboongnyang.drive.TripSummary
 import kotlin.math.floor
 import kotlin.math.min
 
-/** 포인트 적립 기준 (기획서 '기능 ①' 표). 값은 예시이며 테스트 후 조정한다. */
+/**
+ * 포인트 적립 기준 (기획서 '기능 ①' 표). 값은 예시이며 테스트 후 조정한다.
+ * 시연용으로 잘게 쪼갰다: 0.2km 마다 +1, 선물상자 안전운전 2km 마다 (기획 예시: 0.5km, 5km)
+ */
 object PointRules {
-    const val BASE_PER_KM = 1
-    const val SMOOTH_PER_KM = 1
+    /** 기본 주행·부드러운 운전 포인트 단위 거리 */
+    const val UNIT_KM = 0.2
+    const val BASE_PER_UNIT = 1
+    const val SMOOTH_PER_UNIT = 1
     const val SPEED_LIMIT_BONUS = 10
     const val SPEED_LIMIT_RATIO = 0.90
     const val ARRIVAL_BONUS = 10
@@ -19,28 +24,30 @@ object PointRules {
     const val REST_MIN_MS = 15 * 60 * 1000L           // 15분 이상 휴식
     const val STREAK_PER_DAY = 5
     const val STREAK_MAX = 30
-    const val GIFT_BOX_EVERY_SAFE_KM = 30
+    const val GIFT_BOX_EVERY_SAFE_KM = 2.0
     /** 이 비율 이상이면 '안전운전한 날'로 연속 일수에 포함 */
     const val SAFE_DAY_SMOOTH_RATIO = 0.70
     /** 이보다 짧은 운행은 결과를 만들지 않는다 (기어만 D→P 바꾼 경우 등) */
     const val MIN_TRIP_KM = 0.05
 }
 
-/** 레벨: 누적 안전운전 거리(부드러운 구간 km) 기준. */
+/** 레벨: 누적 안전운전 거리(부드러운 구간 km) 기준. 시연용으로 낮춤 (예전: 5/15/30/50/80…km) */
 object Levels {
-    private val thresholds = intArrayOf(0, 5, 15, 30, 50, 80, 120, 170, 230, 300)
+    private val thresholds = doubleArrayOf(0.0, 1.0, 3.0, 6.0, 10.0, 16.0, 24.0, 34.0, 46.0, 60.0)
+    private const val STEP_AFTER_LAST = 20.0
+    private const val EPS = 1e-9
 
-    fun levelFor(safeKm: Int): Int {
-        if (safeKm >= thresholds.last()) return thresholds.size + (safeKm - thresholds.last()) / 100
-        return thresholds.indexOfLast { safeKm >= it } + 1
+    fun levelFor(safeKm: Double): Int {
+        if (safeKm + EPS >= thresholds.last()) return thresholds.size + floor((safeKm - thresholds.last() + EPS) / STEP_AFTER_LAST).toInt()
+        return thresholds.indexOfLast { safeKm + EPS >= it } + 1
     }
 
     /** 다음 레벨에 필요한 누적 안전운전 거리 */
-    fun nextThreshold(level: Int): Int =
-        if (level < thresholds.size) thresholds[level] else thresholds.last() + (level - thresholds.size + 1) * 100
+    fun nextThreshold(level: Int): Double =
+        if (level < thresholds.size) thresholds[level] else thresholds.last() + (level - thresholds.size + 1) * STEP_AFTER_LAST
 
-    fun currentThreshold(level: Int): Int =
-        if (level <= thresholds.size) thresholds[level - 1] else thresholds.last() + (level - thresholds.size) * 100
+    fun currentThreshold(level: Int): Double =
+        if (level <= thresholds.size) thresholds[level - 1] else thresholds.last() + (level - thresholds.size) * STEP_AFTER_LAST
 
     /** 레벨 칭호 */
     fun titleFor(level: Int): String = when {
@@ -57,7 +64,7 @@ data class RewardLine(val label: String, val points: Int)
 
 /** 운행 사이에 이어지는 진행 상태 (DB kv 에 저장) */
 data class ProgressState(
-    val totalSafeKm: Int = 0,
+    val totalSafeKm: Double = 0.0,
     val streakDays: Int = 0,
     /** 마지막으로 '안전운전한 날'의 날짜 키 (yyyymmdd as Int, 로컬 날짜). 0 = 없음 */
     val lastSafeDay: Int = 0,
@@ -104,12 +111,12 @@ object RewardCalculator {
         prevDayKey: Int,
     ): Settlement {
         val lines = mutableListOf<RewardLine>()
-        val km = SafeDrivingEvaluator.floorKm(trip.distanceKm)
-
-        // 기본 주행
-        if (km > 0) lines += RewardLine("주행 ${km}km", km * PointRules.BASE_PER_KM)
-        // 부드러운 운전
-        if (trip.smoothKm > 0) lines += RewardLine("부드러운 운전 ${trip.smoothKm}km", trip.smoothKm * PointRules.SMOOTH_PER_KM)
+        // 기본 주행: 0.2km 마다 +1
+        val baseUnits = units(trip.distanceKm)
+        if (baseUnits > 0) lines += RewardLine("주행 ${kmText(baseUnits * PointRules.UNIT_KM)}km", baseUnits * PointRules.BASE_PER_UNIT)
+        // 부드러운 운전: 급가속·급감속 없는 0.2km 구간 마다 +1
+        val smoothUnits = units(trip.smoothKm)
+        if (smoothUnits > 0) lines += RewardLine("부드러운 운전 ${kmText(smoothUnits * PointRules.UNIT_KM)}km", smoothUnits * PointRules.SMOOTH_PER_UNIT)
         // 규정 속도 준수
         trip.speedLimitRatio?.let { r ->
             if (r >= PointRules.SPEED_LIMIT_RATIO) {
@@ -126,7 +133,7 @@ object RewardCalculator {
         if (rest) lines += RewardLine("휴식 보너스", PointRules.REST_BONUS)
 
         // 연속 안전운전 일수
-        val safeDay = (trip.smoothRatio ?: 0.0) >= PointRules.SAFE_DAY_SMOOTH_RATIO && trip.judgedKm >= 1
+        val safeDay = (trip.smoothRatio ?: 0.0) >= PointRules.SAFE_DAY_SMOOTH_RATIO && trip.judgedKm >= 1.0 - 1e-9
         var streak = state.streakDays
         var lastSafeDay = state.lastSafeDay
         var lastBonusDay = state.lastStreakBonusDay
@@ -140,10 +147,10 @@ object RewardCalculator {
             lastBonusDay = dayKey
         }
 
-        // 선물상자: 누적 안전운전 거리 30km 마다 1개
+        // 선물상자: 누적 안전운전 거리 2km 마다 1개
         val safeBefore = state.totalSafeKm
-        val safeAfter = safeBefore + trip.smoothKm
-        val boxes = safeAfter / PointRules.GIFT_BOX_EVERY_SAFE_KM - safeBefore / PointRules.GIFT_BOX_EVERY_SAFE_KM
+        val safeAfter = round1(safeBefore + trip.smoothKm)
+        val boxes = boxCount(safeAfter) - boxCount(safeBefore)
 
         // 연속 운행 시간 (휴식했으면 리셋)
         val gap = if (state.lastTripEndMs == 0L) Long.MAX_VALUE else trip.startMs - state.lastTripEndMs
@@ -169,12 +176,26 @@ object RewardCalculator {
     }
 
     /** 다음 선물상자까지 남은 안전운전 거리 */
-    fun kmToNextBox(totalSafeKm: Int): Int =
-        PointRules.GIFT_BOX_EVERY_SAFE_KM - totalSafeKm % PointRules.GIFT_BOX_EVERY_SAFE_KM
+    fun kmToNextBox(totalSafeKm: Double): Double =
+        round1((boxCount(totalSafeKm) + 1) * PointRules.GIFT_BOX_EVERY_SAFE_KM - totalSafeKm)
 
     /** 다음 레벨까지 남은 안전운전 거리 */
-    fun kmToNextLevel(totalSafeKm: Int): Int =
-        Levels.nextThreshold(Levels.levelFor(totalSafeKm)) - totalSafeKm
+    fun kmToNextLevel(totalSafeKm: Double): Double =
+        round1(Levels.nextThreshold(Levels.levelFor(totalSafeKm)) - totalSafeKm)
+
+    /** 거리 → 포인트 단위(0.2km) 개수 */
+    fun units(km: Double): Int = floor(km / PointRules.UNIT_KM + 1e-6).toInt()
+
+    private fun boxCount(safeKm: Double): Int = floor(safeKm / PointRules.GIFT_BOX_EVERY_SAFE_KM + 1e-6).toInt()
+
+    /** 0.1km 단위로 반올림 (부동소수 누적 오차 정리) */
+    fun round1(km: Double): Double = kotlin.math.round(km * 10) / 10.0
+
+    /** 1.0 → "1", 1.4 → "1.4" */
+    fun kmText(km: Double): String {
+        val r = round1(km)
+        return if (r == floor(r)) r.toInt().toString() else String.format(java.util.Locale.KOREA, "%.1f", r)
+    }
 
     /** 결과 화면 피드백 문구 (감점 없이, 아쉬운 점은 다음 목표로) */
     fun feedback(trip: TripSummary): String {

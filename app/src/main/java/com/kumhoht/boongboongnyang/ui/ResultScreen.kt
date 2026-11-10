@@ -134,8 +134,8 @@ fun ResultScreen(
                 ProgressBar(wallet.progress.boxFraction, Modifier.padding(top = 12.dp), height = 18.dp)
                 Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("다음 선물상자까지 ${wallet.progress.kmToNextBox}km", fontSize = 26.sp, color = Boong.BrownSoft)
-                        Text("Lv.${wallet.progress.level + 1}까지 ${wallet.progress.kmToNextLevel}km", fontSize = 26.sp, color = Boong.BrownSoft)
+                        Text("다음 선물상자까지 ${km(wallet.progress.kmToNextBox)}km", fontSize = 26.sp, color = Boong.BrownSoft)
+                        Text("Lv.${wallet.progress.level + 1}까지 ${km(wallet.progress.kmToNextLevel)}km", fontSize = 26.sp, color = Boong.BrownSoft)
                     }
                     BoongButton("확인", onConfirm, height = 76.dp, fontSize = 34, padH = 64.dp)
                 }

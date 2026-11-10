@@ -33,7 +33,7 @@ enum class Tab { HOME, SHOP, RECORDS }
 data class Wallet(
     val balance: Int = 0,
     val closedBoxes: Int = 0,
-    val progress: Progress = Progress(ProgressState(), 1, 5, 30, 0f, 0f),
+    val progress: Progress = Progress(ProgressState(), 1, 1.0, PointRules.GIFT_BOX_EVERY_SAFE_KM, 0f, 0f),
     val title: String = Levels.titleFor(1),
 )
 

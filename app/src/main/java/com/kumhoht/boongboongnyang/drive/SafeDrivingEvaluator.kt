@@ -45,7 +45,7 @@ data class SafeDrivingCriteria(
     /** 샘플 간격이 이보다 길면 끊긴 것으로 보고 적분 시간을 자른다 */
     val maxGapMs: Long = 5_000L,
     /** 부드러운 운전 구간 길이 */
-    val segmentKm: Double = 1.0,
+    val segmentKm: Double = 0.2,   // 시연용: 0.2km 구간 (기획 예시 1km → 시연에 맞게 잘게)
     /** 제한속도 허용 오차 (km/h). 기획: '제한속도 이하' → 0 */
     val speedLimitToleranceKmh: Float = 0f,
 ) {
@@ -79,10 +79,10 @@ data class TripSummary(
     val endMs: Long,
     val drivingMs: Long,
     val distanceKm: Double,
-    /** 급가속·급감속 0회로 완주한 1km 구간 수 */
-    val smoothKm: Int,
-    /** 판정이 끝난 1km 구간 수 */
-    val judgedKm: Int,
+    /** 급가속·급감속 0회로 완주한 구간 거리 합 (km, 구간 단위 [SafeDrivingCriteria.segmentKm]) */
+    val smoothKm: Double,
+    /** 판정이 끝난 구간 거리 합 (km) */
+    val judgedKm: Double,
     val harshAccelCount: Int,
     val harshDecelCount: Int,
     /** 제한속도 정보가 있었던 거리 */
@@ -98,7 +98,7 @@ data class TripSummary(
     val beltBuckled: Boolean? = null,
 ) {
     /** 부드러운 운전 비율 0~1. 판정 구간이 없으면 null */
-    val smoothRatio: Double? get() = if (judgedKm > 0) smoothKm.toDouble() / judgedKm else null
+    val smoothRatio: Double? get() = if (judgedKm > 1e-9) smoothKm / judgedKm else null
 
     /** 규정 속도 준수 비율 0~1. 제한속도 정보가 1km 미만이면 null (내비 미연동) */
     val speedLimitRatio: Double? get() = if (limitCoveredKm >= 1.0) limitCompliantKm / limitCoveredKm else null
@@ -125,11 +125,11 @@ class SafeDrivingEvaluator(
     private val window = ArrayDeque<Pair<Long, Float>>()
     private val lastEventAt = HashMap<HarshType, Long>()
 
-    // 1km 구간
+    // 부드러운 운전 판정 구간 (기본 0.2km)
     private var segmentKm = 0.0
     private var segmentEvents = 0
-    private var smoothKm = 0
-    private var judgedKm = 0
+    private var smoothKm = 0.0
+    private var judgedKm = 0.0
 
     private var accelCount = 0
     private var decelCount = 0
@@ -188,12 +188,12 @@ class SafeDrivingEvaluator(
             if (unbuckled && (speed ?: 0f) > c.stopSpeedMaxKmh) unbuckledMovingMs += usableDt
         }
 
-        // 4) 1km 구간 판정
+        // 4) 구간 판정
         segmentKm += dKm
         while (segmentKm >= c.segmentKm - 1e-9) {
             segmentKm = (segmentKm - c.segmentKm).coerceAtLeast(0.0)
-            judgedKm++
-            if (segmentEvents == 0) smoothKm++
+            judgedKm += c.segmentKm
+            if (segmentEvents == 0) smoothKm += c.segmentKm
             segmentEvents = 0
         }
 
@@ -254,7 +254,7 @@ class SafeDrivingEvaluator(
 
     fun finish(endMs: Long): TripSummary {
         val dist = currentDistance()
-        // 판정은 완주한 1km 구간만. (자투리 구간은 다음 운행으로 넘기지 않는다)
+        // 판정은 완주한 구간만. (자투리 구간은 다음 운행으로 넘기지 않는다)
         val smooth = smoothKm
         val judged = judgedKm
         return TripSummary(

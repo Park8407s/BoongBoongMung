@@ -12,8 +12,8 @@ data class TripEntity(
     val endAt: Long,
     val drivingMs: Long,
     val distanceKm: Double,
-    val smoothKm: Int,
-    val judgedKm: Int,
+    val smoothKm: Double,
+    val judgedKm: Double,
     val harshAccel: Int,
     val harshDecel: Int,
     /** 규정 속도 준수 비율 0~1. 내비 미연동이면 null */
@@ -34,7 +34,7 @@ data class TripEntity(
 )
 
 /** 부드러운 운전 비율(%). 판정 구간이 없으면 null */
-fun TripEntity.smoothPercent(): Int? = if (judgedKm > 0) smoothKm * 100 / judgedKm else null
+fun TripEntity.smoothPercent(): Int? = if (judgedKm > 1e-9) (smoothKm * 100 / judgedKm + 1e-6).toInt() else null
 
 /** 생선 포인트 입출금 내역. 잔액 = 합계 */
 @Entity(tableName = "ledger")
