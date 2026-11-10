@@ -1,10 +1,8 @@
 package com.kumhoht.boongboongnyang.ui
 
-import android.Manifest
 import android.app.Activity
 import androidx.compose.ui.platform.LocalContext
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -73,10 +71,7 @@ class MainActivity : ComponentActivity() {
 
     /** 차속(CAR_SPEED)은 위험 권한이라 사용자 허용이 필요하다. */
     private fun requestRuntimePermissions() {
-        val wanted = buildList {
-            add(CAR_SPEED)
-            if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
-        }.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+        val wanted = listOf(CAR_SPEED).filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
         if (wanted.isNotEmpty()) permissionLauncher.launch(wanted.toTypedArray())
     }
 
