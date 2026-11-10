@@ -95,12 +95,12 @@
 3. **adb 치트** (디버그 빌드에서만 동작, 제출한 release APK 에는 없음)
 
 ```bash
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --es gear D --ef speed 40
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ei limit 50
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez arrive true
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez belt false
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --es gear P --ef speed 0
-adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez clear true
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --es gear D --ef speed 40
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --ei limit 50
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --ez arrive true
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --ez belt false
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --es gear P --ef speed 0
+adb shell am broadcast -a com.drivetail.boongboongnyang.SIM --ez clear true
 ```
 
 ## 에뮬레이터 한계와 대응
@@ -116,7 +116,7 @@ adb shell am broadcast -a com.kumhoht.boongboongnyang.SIM --ez clear true
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) 참고.
 
 ```
-app/src/main/java/com/kumhoht/boongboongnyang/
+app/src/main/java/com/drivetail/boongboongnyang/
   vehicle/   차량 신호 수집 (TelemetryCollector, SeatBeltProbe)
   drive/     운행 상태 머신, 안전운전 판정, 백그라운드 서비스
   reward/    포인트·레벨·선물상자 규칙, 아이템 카탈로그

@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.kumhoht.boongboongnyang"
+    namespace = "com.drivetail.boongboongnyang"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.kumhoht.boongboongnyang"
+        applicationId = "com.drivetail.boongboongnyang"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
