@@ -1,6 +1,6 @@
 <resources>
     <!-- 화면은 Compose(ui/theme)가 그린다. 여기서는 상단 바를 없애고 배경만 크림색으로. -->
-    <style name="Theme.BoongBoongMung" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.BoongBoongNyang" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">#FF2A211B</item>
         <item name="android:statusBarColor">#FF2A211B</item>
         <item name="android:navigationBarColor">#FF2A211B</item>
