@@ -6,7 +6,7 @@
 
 ## APK 파일
 
-- 위치: [`apk/금호HT_붕붕냥_release.apk`](apk/금호HT_붕붕냥_release.apk)
+- 위치: [`apk/드라이브테일_붕붕냥_release.apk`](apk/드라이브테일_붕붕냥_release.apk)
 - release 빌드 (공모전 제출용으로 디버그 키 서명)
 
 ## 테스트 환경
@@ -21,7 +21,7 @@
 2. APK 를 설치합니다. `-g` 는 차량 권한(차속 등)을 설치할 때 한 번에 허용합니다.
 
 ```bash
-adb install -r -g "apk/금호HT_붕붕냥_release.apk"
+adb install -r -g "apk/드라이브테일_붕붕냥_release.apk"
 ```
 
 3. 하단 독(앱 목록)에서 붕붕냥 아이콘(고양이 얼굴)을 누릅니다.
