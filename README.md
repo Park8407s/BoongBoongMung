@@ -26,7 +26,7 @@
      ```
 
    - **방법 B. 끌어다 놓기**: APK 파일을 에뮬레이터 화면 위로 드래그해서 놓으면 설치됩니다.
-     이때는 권한이 자동으로 허용되지 않으므로, **앱을 처음 실행할 때 뜨는 권한 요청(차속·알림)을 모두 '허용'** 해 주세요.
+     이때는 차속 권한이 자동으로 허용되지 않으므로, **앱을 처음 실행할 때 뜨는 차속 권한 요청을 '허용'** 해 주세요.
      허용하지 않으면 차속을 받지 못해 주행이 기록되지 않습니다.
 3. 하단 독(앱 목록)에서 붕붕냥 아이콘(고양이 얼굴)을 누릅니다.
    - 방법 B 로 설치했다면 이때 권한 요청이 뜹니다. '허용'을 눌러 주세요.
@@ -35,15 +35,16 @@
    - 시동(부팅) 때 자동으로 켜지지 않습니다. 출발 전에 붕붕냥을 열어 인사하세요.
    - 완전히 끄려면 기록 탭 → '붕붕냥 끄기' (다시 열면 다시 켜짐).
 
-**필요한 권한** (매니페스트에 선언, 설치 시 허용)
+**필요한 권한** (모두 매니페스트에 선언. `CAR_SPEED` 만 위험 권한이라 첫 실행 때 허용이 필요하고, 나머지는 설치할 때 자동으로 허용됩니다)
 
 | 권한 | 용도 |
 |---|---|
-| `android.car.permission.CAR_SPEED`, `CAR_POWERTRAIN` | 차속, 기어 |
+| `android.car.permission.CAR_SPEED` (실행 중 허용) | 차속 |
+| `android.car.permission.CAR_POWERTRAIN` | 기어 |
 | `pleos.car.permission.CAR_DRIVE` | 기어·브레이크·누적 주행거리 |
 | `pleos.car.permission.NAVI_ROUTE` | 제한속도·목적지 도착 |
 | `pleos.car.permission.CAR_SAFETY`, `PRIVATE_CAR_SAFETY`, `CAR_SEATS` | 안전벨트 |
-| `FOREGROUND_SERVICE` | 앱을 연 뒤 백그라운드로 내려도 운행 집계 유지 (부팅 시 자동 시작 안 함) |
+| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_SPECIAL_USE` | 앱을 연 뒤 백그라운드로 내려도 운행 집계 유지 (부팅 시 자동 시작 안 함) |
 
 ## 핵심 기능
 
